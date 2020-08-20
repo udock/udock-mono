@@ -1,0 +1,30 @@
+{
+  "name": "@udock/vue-plugin-auto-router",
+  "version": "2.0.5",
+  "description": "@udock/vue-plugin-auto-router",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "template": "template"
+  },
+  "scripts": {
+    "prepublish": "tsc",
+    "link": "yarn link",
+    "unlink": "yarn unlink"
+  },
+  "author": "vaniship@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "hash-sum": "^2.0.0",
+    "pify": "^4.0.1",
+    "serialize-javascript": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/serialize-javascript": "^4.0.0"
+  },
+  "peerDependencies": {
+    "lodash": "^4.17.19",
+    "vue": "^3.0.0-rc.5",
+    "vue-router": "^3.4.3"
+  }
+}
