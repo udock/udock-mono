@@ -1,0 +1,272 @@
+@charset "UTF-8";
+@import './_settings.scss';
+.#{$ui-input-prefix-cls} {
+  width:100%;
+  display:inline-block;
+  position:relative;
+  font-size: $ui-input-font-size-base;
+  &.is-disabled {
+    .#{$ui-input-prefix-cls}__inner {
+      background-color: $ui-input-disabled-bg-color;
+      border-color: $ui-input-disabled-border-color;
+      color: $ui-input-disabled-color;
+      cursor: $ui-input-cursor-disabled;
+      &::-webkit-input-placeholder {
+        color: $ui-input-disabled-placeholder-color;
+      }
+      &::-moz-placeholder {
+        color: $ui-input-disabled-placeholder-color;
+      }
+      &:-ms-input-placeholder {
+        color: $ui-input-disabled-placeholder-color;
+      }
+      &::placeholder {
+        color: $ui-input-disabled-placeholder-color;
+      }
+    }
+  }
+  &.is-active .#{$ui-input-prefix-cls}__inner{
+    outline:0;
+    border-color: $ui-input-active-border-color;
+  }
+}
+
+
+.#{$ui-input-prefix-cls}__inner {
+  &::-webkit-input-placeholder{
+    color:$ui-input-placeholder-color;
+  }
+  &::-moz-placeholder{
+    color:$ui-input-placeholder-color;
+  }
+  &:-ms-input-placeholder{
+    color:$ui-input-placeholder-color;
+  }
+  &::placeholder{
+    color:$ui-input-placeholder-color;
+  }
+  &:hover{
+    border-color: $ui-input-hover-border-color;
+  }
+  &:focus{
+    outline:0;
+    border-color: $ui-input-focus-border-color;
+  }
+
+  width:100%;
+  display: inline-block;
+  box-sizing: border-box;
+
+  background-image: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  appearance: none;
+  background-color: $ui-input-bg-color;
+  border-radius: $ui-input-border-radius;
+
+  border: $ui-input-border;
+  color: $ui-input-color;
+  font-size:inherit;
+
+  height:36px;
+  line-height:1;
+  outline:0;
+
+  padding:3px 10px;
+  transition: $ui-input-border-color .2s cubic-bezier(.645,.045,.355,1)
+}
+
+.u-textarea__inner{
+  box-sizing:border-box;
+  background-image:none
+}
+
+.is-validating {
+  .#{$ui-input-prefix-cls}__icon{
+    &:after{
+      content:'\F29C';
+      height:100%;
+      width:100%;
+      display:inline-block;
+      vertical-align:middle;
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:0;
+      right:0;
+    }
+  }
+}
+.#{$ui-input-prefix-cls}__icon{
+  &:after{
+    content:'\F29C';
+    height:100%;
+    width:0;
+    display:inline-block;
+    vertical-align:middle;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+  }
+  +.#{$ui-input-prefix-cls}__inner{padding-right:35px}
+  &.is-clickable:hover{
+    cursor:pointer;
+    color: $ui-input-clickable-hover-color;
+  }
+  &.is-clickable:hover+.#{$ui-input-prefix-cls}__inner{
+    border-color: $ui-input-clickable-hover-border-color;
+    border-color:#8391a5;
+  }
+
+  position:absolute;
+  width:35px;
+  height:100%;
+  font-family: 'u-icons';
+  line-height:36px;
+  font-size:16px;
+  font-style: normal;
+  right:0;
+  top:0;
+  text-align:center;
+
+  color: $ui-input-append-icon-color;
+
+  transition:all .3s
+}
+
+.#{$ui-input-prefix-cls}--large .#{$ui-input-prefix-cls}__inner{
+  font-size: $ui-input-font-size-large;
+  height:42px
+}
+.#{$ui-input-prefix-cls}--small .#{$ui-input-prefix-cls}__inner{
+  font-size: $ui-input-font-size-small;
+  height:30px;
+}
+.#{$ui-input-prefix-cls}--mini .#{$ui-input-prefix-cls}__inner{
+  font-size: $ui-input-font-size-mini;
+  height:22px;
+}
+
+.#{$ui-input-prefix-cls}-group{
+  line-height:normal;
+  display:inline-table;
+  width:100%;
+  border-collapse:separate;
+
+  >.#{$ui-input-prefix-cls}__inner {
+    vertical-align:middle;
+    display:table-cell;
+  }
+}
+
+.#{$ui-input-prefix-cls}-group__append,
+.#{$ui-input-prefix-cls}-group__prepend {
+  background-color: lighten($ui-input-bg-color, 1.02);
+  color:#97a8be;
+  color: $ui-input-slot-color;
+  vertical-align:middle;
+  display:table-cell;
+  position:relative;
+  border:1px solid $ui-input-border-color;
+  border-radius:4px;
+  padding:0 10px;
+  width:1px;
+  white-space:nowrap
+}
+
+
+.#{$ui-input-prefix-cls}-group--prepend .#{$ui-input-prefix-cls}__inner,
+.#{$ui-input-prefix-cls}-group__append {
+  border-top-left-radius:0;
+  border-bottom-left-radius:0
+}
+
+.#{$ui-input-prefix-cls}-group__prepend {
+  border-right:0;
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+
+  .u-button, .u-select {
+    display:block;
+    margin:-10px
+  }
+
+  button.u-button,
+  div.u-select .#{$ui-input-prefix-cls}__inner,
+  div.u-select:hover .#{$ui-input-prefix-cls}__inner{
+    border-color:transparent;
+    background-color:transparent;
+    color:inherit;
+    border-top:0;
+    border-bottom:0
+  }
+
+  .u-button,
+  .#{$ui-input-prefix-cls} {font-size:inherit}
+}
+
+.#{$ui-input-prefix-cls}-group--append .#{$ui-input-prefix-cls}__inner{
+  border-top-right-radius:0;
+  border-bottom-right-radius:0
+}
+
+.#{$ui-input-prefix-cls}-group__append{
+  border-left:0;
+  .u-button,
+  .u-select,
+  button.u-button,
+  div.u-select .#{$ui-input-prefix-cls}__inner,
+  div.u-select:hover .#{$ui-input-prefix-cls}__inner,
+  .u-button,
+  .#{$ui-input-prefix-cls} {
+    border-left:0;
+  }
+}
+
+.u-textarea {
+  display:inline-block;
+  width:100%;
+  vertical-align:bottom;
+
+  &.is-disabled {
+    .u-textarea__inner{
+      background-color: $textarea-disabled-bg-color;
+      border-color: $textarea-disabled-border-color;
+      color: $textarea-disabled-color;
+      cursor:not-allowed;
+
+      &::-webkit-input-placeholder{color:#bfcbd9}
+      &::-moz-placeholder{color:#bfcbd9}
+      &:-ms-input-placeholder{color:#bfcbd9}
+      &::placeholder{color:#bfcbd9}
+    }
+  }
+}
+
+.u-textarea__inner{
+  display:block;
+  resize:vertical;
+  padding:5px 7px;
+
+  line-height:1.5;
+  width:100%;
+  font-size:14px;
+
+  color:#1f2d3d;
+  background-color: $textarea-bg-color;
+  border:1px solid $textarea-border-color;
+
+  border-radius:4px;
+  transition:border-color .2s cubic-bezier(.645,.045,.355,1);
+
+  &::-webkit-input-placeholder{color: $textarea-placeholder-color}
+  &::-moz-placeholder{color:$textarea-placeholder-color}
+  &:-ms-input-placeholder{color:$textarea-placeholder-color}
+
+  &::placeholder{color:$textarea-placeholder-color;}
+  &:hover{border-color:$textarea-hover-border-color;}
+  &:focus{outline:0;border-color:$textarea-focus-border-color;}
+}
