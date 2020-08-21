@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "preserve",
+    "noEmit": true                        /* Do not emit outputs. */
+  },
+  "references": [
+    { "path": "./packages/react-app-rewire-auto-router" },
+    { "path": "./packages/react-plugin-auto-router" },
+    { "path": "./packages/react-plugin-hooks" },
+    { "path": "./packages/vue-cli-plugin-auto-router" },
+    { "path": "./packages/vue-cli-plugin-i18n" },
+    { "path": "./packages/vue-cli-plugin-ui" },
+    { "path": "./packages/vue-plugin-auto-router" },
+    { "path": "./packages/vue-plugin-composition-api" },
+    { "path": "./packages/vue-plugin-i18n" },
+    { "path": "./packages/vue-plugin-ui" },
+    { "path": "./packages/vue-plugin-ui--theme-default" },
+  ]
+}

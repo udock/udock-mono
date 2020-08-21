@@ -1,7 +1,6 @@
 const yargs = require('yargs')
 const execa = require('execa')
 const getPackageDir = require('./utils/getPackageDir')
-const allPackages = require('./utils/allPackages')
 
 const argv = yargs
   .option('all', {
@@ -21,14 +20,22 @@ const argv = yargs
   })
   .argv
 
-if (argv.all) argv.projects = allPackages
-
-if (argv.projects) {
+if (argv.all) {
+  execa('tsc',
+    [
+      '-b',
+      ...(argv.watch ? ['-w']: [])
+    ],
+    {
+      stdio: "inherit",
+    }
+  )
+} else {
   argv.projects.forEach((project) => {
     console.log(`build ${project} ...`)
     execa('tsc',
       [
-        ...(!argv.all && argv.watch ? ['-w']: [])
+        ...(argv.projects.length === 1 && argv.watch ? ['-w']: [])
       ],
       {
         cwd: getPackageDir(project),
@@ -40,6 +47,3 @@ if (argv.projects) {
     })
   })
 }
-
-
-
