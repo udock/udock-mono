@@ -5,10 +5,8 @@
   "author": {
     "name": "vaniship@gmail.com"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "link": "yarn link",
-    "unlink": "yarn unlink"
   },
   "dependencies": {
     "@udock/react-plugin-auto-router": "^2.0.0",

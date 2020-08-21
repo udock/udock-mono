@@ -2,15 +2,13 @@
   "name": "@udock/vue-plugin-auto-router",
   "version": "3.0.2",
   "description": "@udock/vue-plugin-auto-router",
-  "main": "index.js",
+  "main": "dist/index.js",
   "directories": {
     "lib": "lib",
     "template": "template"
   },
   "scripts": {
-    "prepublish": "tsc",
-    "link": "yarn link",
-    "unlink": "yarn unlink"
+    "prepublish": "tsc"
   },
   "author": "vaniship@gmail.com",
   "license": "MIT",

@@ -6,13 +6,11 @@
     "name": "vaniship@gmail.com"
   },
   "scripts": {
-    "prepublish": "tsc",
-    "link": "yarn link",
-    "unlink": "yarn unlink"
+    "prepublish": "tsc"
   },
   "dependencies": {
     "@udock/vue-plugin-i18n": "^3.0.0"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT"
 }

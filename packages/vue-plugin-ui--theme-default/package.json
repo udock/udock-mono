@@ -9,8 +9,6 @@
   ],
   "main": "src/scss/index.scss",
   "scripts": {
-    "link": "yarn link",
-    "unlink": "yarn unlink"
   },
   "license": "MIT"
 }

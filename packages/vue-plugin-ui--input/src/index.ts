@@ -1,14 +1,14 @@
 import { App, h } from 'vue'
-import Input from './components/Input.vue'
+// import Input from './components/Input.vue'
 
-export default function (app: App, options: any) {
-  app.component(options.name || 'UInput', {
-    setup (props: any, context: any) {
-      return () => h(Input, {
-        i18n: options.i18n,
-        i18nMessages: options.i18nMessages,
-        ...props
-      }, context.slots)
-    }
-  })
-}
+// export default function (app: App, options: any) {
+  // app.component(options.name || 'UInput', {
+  //   setup (props: any, context: any) {
+  //     return () => h(Input, {
+  //       i18n: options.i18n,
+  //       i18nMessages: options.i18nMessages,
+  //       ...props
+  //     }, context.slots)
+  //   }
+  // })
+// }
