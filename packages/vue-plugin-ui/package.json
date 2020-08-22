@@ -9,7 +9,7 @@
     "lib": "lib",
     "template": "template"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "peerDependencies": {
     "lodash": "^4.17.19",
     "vue": "^3.0.0-rc.5"

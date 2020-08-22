@@ -8,6 +8,9 @@
   "scripts": {
     "prepublish": "tsc"
   },
+  "dependencies": {
+    "@udock/vue-plugin-ui": "^3.0.0"
+  },
   "peerDependencies": {
     "@udock/vue-plugin-i18n": "^3.0.0"
   },

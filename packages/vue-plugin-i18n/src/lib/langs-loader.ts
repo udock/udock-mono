@@ -45,7 +45,7 @@ function generate (loader: webpack.loader.LoaderContext, options: I18nOptions) {
     chunkNameBase
   }
   const imports = {}
-  const templateFilePath = path.resolve(__dirname, '..', 'template', 'langs.js')
+  const templateFilePath = path.resolve(__dirname, '..', '..', 'template', 'langs.js')
   const fileContent = fs.readFileSync(templateFilePath, 'utf8')
   const template = _.template(fileContent, { imports })
   return {

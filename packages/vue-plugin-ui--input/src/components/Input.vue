@@ -62,12 +62,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue'
 import defaultMessages from '../i18n/langs'
 import { mixins } from '@udock/vue-plugin-ui'
 import calcTextareaHeight from '../lib/calcTextareaHeight'
 import merge from 'lodash/merge'
 
-export default {
+export default defineComponent({
   name: 'UInput',
   componentName: 'UInput',
   // mixins: [mixins.Emitter],
@@ -136,7 +137,7 @@ export default {
       return this.value || this.modelValue
     },
     validating () {
-      return this.$parent.validateState === 'validating'
+      return false // this.$parent.validateState === 'validating'
     },
     textareaStyle () {
       return merge({}, this.textareaCalcStyle, { resize: this.resize })
@@ -197,5 +198,5 @@ export default {
   mounted () {
     this.resizeTextarea()
   }
-}
+})
 </script>
