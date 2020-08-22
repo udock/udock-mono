@@ -9,7 +9,6 @@
       'u-input-group--prepend': $slots.prepend
     }
   ]">
-  {{$slots.icon}}
     <template v-if="type !== 'textarea'">
       <!-- 前置元素 -->
       <div class="u-input-group__prepend" v-if="$slots.prepend">

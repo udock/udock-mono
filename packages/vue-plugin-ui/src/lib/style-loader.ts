@@ -37,7 +37,7 @@ export = function styleLoader(this: webpack.loader.LoaderContext, content: strin
     }
   }
 
-  const componentName = 'input'
+  const componentName = this.resourcePath.replace(/^.*\/vue-plugin-ui--([\w-]+)\/src\/scss\/index.scss$/, '$1')
 
   // let preStyles = `@import '${uiConfig.theme}';\n`
   let preStyles = "@import '@udock/vue-plugin-ui--theme-default';\n"
@@ -47,7 +47,7 @@ export = function styleLoader(this: webpack.loader.LoaderContext, content: strin
   })
 
   // 组件预加载样式
-  uiConfig.components[componentName]['pre-styles']!.forEach((item: string) => {
+  uiConfig.components[componentName]['pre-styles']?.forEach((item: string) => {
     preStyles += `@import '${item}';\n`
   })
 
@@ -62,7 +62,7 @@ export = function styleLoader(this: webpack.loader.LoaderContext, content: strin
   }
 
   // 组件后加载样式
-  uiConfig.components[componentName]['post-styles']!.forEach((item: string) => {
+  uiConfig.components[componentName]['post-styles']?.forEach((item: string) => {
     content += `\n@import '${item}';`
   })
 
