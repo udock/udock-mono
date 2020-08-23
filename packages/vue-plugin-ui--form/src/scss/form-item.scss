@@ -1,0 +1,67 @@
+.#{$ui-form-item-cls} {
+  margin-bottom:22px;
+  .#{$ui-form-item-cls} { margin-bottom:0 }
+
+  &:after, &:before {
+    display:table;
+    content:""
+  }
+
+  &.is-error {
+    .el-input-group__append .el-input__inner,
+    .el-input-group__prepend .el-input__inner,
+    .el-input__inner { border-color:transparent }
+
+    &.is-error .el-input__inner,
+    &.is-error .el-textarea__inner{ border-color:$error-color }
+  }
+
+  &.is-required .#{$ui-form-item-cls}__label:before{
+    content:'*';
+    color:$error-color;
+    margin-right:4px
+  }
+
+  &__label{
+    text-align:right;
+    vertical-align:middle;
+    float:left;
+    font-size:12px;
+    color:$text-color;
+    line-height:1;
+    padding:11px 12px 11px 0;
+    box-sizing:border-box
+  }
+  &__content{
+    line-height:36px;
+    position:relative;
+    font-size:14px
+  }
+
+  &__content:after,
+  &__content:before{
+    display:table;
+    content:""
+  }
+  &__error {
+    color: $error-color;
+    font-size: 12px;
+    padding-top: 4px;
+    position: absolute;
+    line-height: 12px;
+    top: 100%;
+    left: 0;
+  }
+}
+
+.#{$css-prefix}label--left .#{$ui-form-item-cls}__label{ text-align:left }
+.#{$css-prefix}label--top .#{$ui-form-item-cls}__label{
+  float:none;
+  display:inline-block;
+  text-align:left;
+  padding:0 0 10px
+}
+.#{$ui-form-cls}--inline .#{$ui-form-item-cls}__label{
+  float:none;
+  display:inline-block
+}

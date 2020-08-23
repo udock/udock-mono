@@ -1,0 +1,91 @@
+.#{$ui-form-item-cls} {
+  margin-bottom:22px;
+
+  &:after {
+    clear:both
+  }
+  &:after,
+  &:before {
+    display:table;
+    content:""
+  }
+  .#{$ui-form-item-cls}{ margin-bottom:0 }
+}
+
+.#{$ui-form-item-cls} {
+  &.is-error {
+    .el-input-group__append .el-input__inner,
+    .el-input-group__prepend .el-input__inner,
+    .el-input__inner{ border-color:transparent }
+  }
+  &.is-error {
+    .#{$css-prefix}input-group__append .#{$css-prefix}input__inner,
+    .#{$css-prefix}input-group__prepend .#{$css-prefix}input__inner,
+    .#{$css-prefix}input__inner{ border-color:transparent }
+  }
+}
+
+.#{$ui-form-cls}--inline {
+  .#{$ui-form-item-cls}, .#{$ui-form-item-cls}__content {
+    display:inline-block;
+    vertical-align:top;
+  }
+  .#{$ui-form-item-cls}{ margin-right:10px }
+  &.#{$ui-form-cls}--label-top .#{$ui-form-item-cls}__content{ display:block }
+}
+
+.#{$ui-form-item-cls}__content {
+  &:after{ clear:both }
+}
+
+.#{$ui-form-item-cls}.is-error {
+  .el-input__inner,.el-textarea__inner,.ivu-input{ border-color:$error-color }
+  .#{$css-prefix}input__inner,.#{$css-prefix}textarea__inner,.ivu-input{ border-color:$error-color }
+}
+.#{$ui-form-item-cls}.is-required .#{$ui-form-item-cls}__label:before{
+  content:'*';
+  color:$error-color;
+  margin-right:4px
+}
+.#{$ui-form-cls}--label-left .#{$ui-form-item-cls}__label{ text-align:left }
+.#{$ui-form-cls}--label-top .#{$ui-form-item-cls}__label{
+  float:none;
+  display:inline-block;
+  text-align:left;
+  padding:0 0 10px
+}
+.#{$ui-form-cls}--inline .#{$ui-form-item-cls}__label{
+  float:none;
+  display:inline-block
+}
+.#{$ui-form-item-cls}__label{
+  text-align:right;
+  vertical-align:middle;
+  float:left;
+  font-size:12px;
+  color:$text-color;
+  line-height:1;
+  padding:11px 12px 11px 0;
+  box-sizing:border-box
+}
+.#{$ui-form-item-cls}__content{
+  line-height:36px;
+  position:relative;
+  font-size:14px;
+
+  &:after,
+  &:before {
+    display:table;
+    content:""
+  }
+}
+
+.#{$ui-form-item-cls}__error {
+  color: $error-color;
+  font-size: 12px;
+  padding-top: 4px;
+  position: absolute;
+  line-height: 12px;
+  top: 100%;
+  left: 0;
+}
