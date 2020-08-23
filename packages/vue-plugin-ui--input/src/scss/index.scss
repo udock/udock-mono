@@ -82,27 +82,11 @@
   background-image:none
 }
 
-.is-validating {
-  .#{$ui-input-prefix-cls}__icon{
-    &:after{
-      content:'\F29C';
-      height:100%;
-      width:100%;
-      display:inline-block;
-      vertical-align:middle;
-      position:absolute;
-      top:0;
-      bottom:0;
-      left:0;
-      right:0;
-    }
-  }
-}
-.#{$ui-input-prefix-cls}__icon{
+.is-validating.#{$ui-input-prefix-cls}__icon{
   &:after{
     content:'\F29C';
     height:100%;
-    width:0;
+    width:100%;
     display:inline-block;
     vertical-align:middle;
     position:absolute;
@@ -111,6 +95,20 @@
     left:0;
     right:0;
   }
+}
+.#{$ui-input-prefix-cls}__icon{
+  // &:after{
+  //   content:'\F29C';
+  //   height:100%;
+  //   width:0;
+  //   display:inline-block;
+  //   vertical-align:middle;
+  //   position:absolute;
+  //   top:0;
+  //   bottom:0;
+  //   left:0;
+  //   right:0;
+  // }
   +.#{$ui-input-prefix-cls}__inner{padding-right:35px}
   &.is-clickable:hover{
     cursor:pointer;

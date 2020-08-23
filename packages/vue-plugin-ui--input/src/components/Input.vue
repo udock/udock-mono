@@ -21,7 +21,7 @@
             'u-icon-' + icon,
             onIconClick ? 'is-clickable' : ''
           ]"
-          v-if="icon"
+          v-if="icon && !validating"
           @click="handleIconClick">
         </i>
       </slot>
@@ -38,7 +38,7 @@
         @focus="handleFocus"
         @blur="handleBlur"
       >
-      <i class="u-input__icon u-icon-loading u-anim-load-loop" v-if="validating"></i>
+      <i class="u-input__icon u-icon-loading u-anim-load-loop is-validating" v-if="validating"></i>
       <!-- 后置元素 -->
       <div class="u-input-group__append" v-if="$slots.append">
         <slot name="append"></slot>
@@ -60,24 +60,28 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue'
 import defaultMessages from '../i18n/langs'
-import { mixins } from '@udock/vue-plugin-ui'
 import calcTextareaHeight from '../lib/calcTextareaHeight'
 import merge from 'lodash/merge'
 
 export default defineComponent({
   name: 'UInput',
   componentName: 'UInput',
-  // mixins: [mixins.Emitter],
+  inject: {
+    formItem: '#UFormItem'
+  },
   data () {
     return {
       textareaCalcStyle: {}
     }
   },
   props: {
-    i18n: Function,
+    i18n: {
+      type: Function,
+      required: true
+    },
     i18nMessages: Object,
     value: {
       type: [String, Number],
@@ -100,7 +104,7 @@ export default defineComponent({
     },
     name: String,
     autosize: {
-      type: [Boolean, Object],
+      type: [Boolean, Object] as boolean & object,
       default: false
     },
     rows: {
@@ -131,26 +135,26 @@ export default defineComponent({
     }
   },
   computed: {
-    currentValue () {
+    currentValue (): string | number {
       this.handleInputOther(this.value)
       return this.value || this.modelValue
     },
-    validating () {
-      return false // this.$parent.validateState === 'validating'
+    validating (): boolean {
+      return (this.$parent?.$data as { validateState: string }).validateState === 'validating'
     },
-    textareaStyle () {
+    textareaStyle (): object {
       return merge({}, this.textareaCalcStyle, { resize: this.resize })
     }
   },
   methods: {
-    handleBlur (event) {
+    handleBlur (event: FocusEvent) {
       this.$emit('blur', event)
-      if (this.validateEvent) {
-        // this.dispatch('ElFormItem', 'u.form.blur', [this.currentValue])
+      if (this.validateEvent && this.formItem) {
+        this.formItem.onFieldBlur(this.currentValue)
       }
     },
     inputSelect () {
-      this.$refs.input.select()
+      (this.$refs.input as HTMLInputElement).select()
     },
     resizeTextarea () {
       if (this.$isServer) return
@@ -159,13 +163,15 @@ export default defineComponent({
       const minRows = autosize.minRows
       const maxRows = autosize.maxRows
 
-      this.textareaCalcStyle = calcTextareaHeight(this.$refs.textarea, minRows, maxRows)
+      this.textareaCalcStyle = calcTextareaHeight(this.$refs.textarea as HTMLTextAreaElement, minRows, maxRows)
     },
-    handleFocus (event) {
+    handleFocus (event: FocusEvent) {
       this.$emit('focus', event)
     },
-    handleInput (event) {
-      const value = this.type === 'number' ? parseFloat(event.target.value) : event.target.value
+    handleInput (event: KeyboardEvent) {
+      const value = this.type === 'number'
+        ? parseFloat((event.target as HTMLInputElement).value)
+        : (event.target as HTMLInputElement).value
       this.handleInputOther(value)
       if (this.modelValue !== undefined) {
         this.$emit('update:modelValue', value)
@@ -173,22 +179,22 @@ export default defineComponent({
       this.$emit('input', value)
       this.$emit('change', value)
     },
-    handleInputOther (value) {
-      this.$nextTick(_ => {
+    handleInputOther (value: string | number) {
+      this.$nextTick(() => {
         this.resizeTextarea()
       })
-      if (this.validateEvent) {
-        // this.dispatch('ElFormItem', 'u.form.change', [value])
+      if (this.validateEvent && this.formItem) {
+        this.formItem.onFieldChange(value)
       }
     },
-    handleIconClick (event) {
+    handleIconClick (event: MouseEvent) {
       if (this.onIconClick) {
         this.onIconClick(event)
       }
       this.$emit('click', event)
     },
     focus () {
-      (this.$refs.textarea || this.$refs.input).focus()
+      (this.$refs.textarea as HTMLTextAreaElement || this.$refs.input as HTMLInputElement).focus()
     }
   },
   created () {
