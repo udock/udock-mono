@@ -15,7 +15,6 @@
     { "path": "./packages/vue-plugin-auto-router" },
     { "path": "./packages/vue-plugin-composition-api" },
     { "path": "./packages/vue-plugin-i18n" },
-    { "path": "./packages/vue-plugin-ui" },
-    { "path": "./packages/vue-plugin-ui--theme-default" },
+    { "path": "./packages/vue-plugin-ui" }
   ]
 }
