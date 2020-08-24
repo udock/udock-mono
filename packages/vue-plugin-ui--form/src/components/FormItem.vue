@@ -275,7 +275,7 @@ export default defineComponent({
     formatArray (v = []) {
       return !Array.isArray(v) && isObject(v) ? [v] : v
     },
-    getRules (): (RuleItem & { trigger: string })[] {
+    getRules (): (RuleItem & { trigger: string; label: string })[] {
       return this.mergedRules
     },
     getFilteredRule (trigger: string): RuleItem[] {
@@ -284,6 +284,7 @@ export default defineComponent({
         return !rule.trigger || rule.trigger.indexOf(trigger) !== -1
       }).map((rule) => {
         rule = { ...rule }
+        rule.label = this.label || ''
         if (rule.message) {
           rule.message = {
             data: rule,
