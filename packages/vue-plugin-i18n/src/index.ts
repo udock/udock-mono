@@ -11,6 +11,6 @@ type I18nOptions = {
 export default (options?: I18nOptions) => {
   return {
     $lang: ref('zh-CN'),
-    $t: () => {}
+    $t: (key: string) => { return key }
   }
 }

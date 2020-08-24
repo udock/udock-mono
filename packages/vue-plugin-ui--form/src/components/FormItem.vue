@@ -145,13 +145,17 @@ export default defineComponent({
         if (this.validateState === 'success') return ''
         const rule = this.validateError
         if (rule && rule.message) {
-          const r = rule.message.data
-          const compiled = template(rule.message.value, {
-            imports: {
-              t: (key: string) => template(this.$t(key))(r)
-            }
-          })
-          return compiled(r)
+          if (isObject(rule.message)) {
+            const r = rule.message.data
+            const compiled = template(rule.message.value, {
+              imports: {
+                t: (key: string) => template(this.$t(key))(r)
+              }
+            })
+            return compiled(r)
+          } else {
+            return rule.message
+          }
         }
         return ''
       },
@@ -279,14 +283,15 @@ export default defineComponent({
       return rules.filter((rule) => {
         return !rule.trigger || rule.trigger.indexOf(trigger) !== -1
       }).map((rule) => {
-        return {
-          ...rule,
-          message: {
+        rule = { ...rule }
+        if (rule.message) {
+          rule.message = {
             data: rule,
             value: rule.message
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any
         }
+        return rule
       })
     },
     onFieldBlur () {

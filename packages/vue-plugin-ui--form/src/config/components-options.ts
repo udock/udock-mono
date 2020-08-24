@@ -1,7 +1,6 @@
 export default {
   validator: {
     messages: {},
-    rules: {
-    }
+    rules: {}
   }
 }
