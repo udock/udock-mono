@@ -109,35 +109,35 @@ export default {
     invalid: '请输入有效的日期',
     parse: '请输入有效的日期'
   },
-  default: '%s验证失败',
-  enum: '%s必须是以下值之一[%s]',
+  default: '${label}验证失败',
+  enum: '${label}必须是以下值之一[${$ctx["enum"]}]',
   number: {
-    len: '%s的长度必须为%s',
-    max: '%s的长度不能超过%s',
-    min: '%s的长度不能小于%s',
-    range: '请输入有效的%s(%s-%s)！'
+    len: '${label}的长度必须为${len}',
+    max: '${label}的值不能超过${max}',
+    min: '${label}的值不能小于${lmin}',
+    range: '请输入有效的${label}(${min}-${max})！'
   },
   pattern: {
-    mismatch: '请输入正确的%s！'
+    mismatch: '请输入正确的${label}！'
   },
-  required: '请输入%s！',
+  required: '请输入${label}！',
   string: {
-    len: '%s的长度必须为%s',
-    max: '%s的长度不能超过%s',
-    min: '%s的长度不能小于%s',
-    range: '请输入有效的%s(%s-%s)！'
+    len: '${label}的长度必须为${len}',
+    max: '${label}的长度不能超过${max}',
+    min: '${label}的长度不能小于${min}',
+    range: '请输入有效的${label}(${min}-${max})！'
   },
   types: {
-    array: '%s必须是数组',
-    date: '%s必须是日期',
-    email: '%s必须是网络邮箱地址',
-    float: '%s必须是浮点数',
-    integer: '%s必须是整数',
-    number: '%s必须是数字',
-    string: '%s必须是文本',
-    url: '%s必须是url'
+    array: '${label}必须是数组',
+    date: '${label}必须是日期',
+    email: '${label}必须是网络邮箱地址',
+    float: '${label}必须是浮点数',
+    integer: '${label}必须是整数',
+    number: '${label}必须是数字',
+    string: '${label}必须是文本',
+    url: '${label}必须是url'
   },
-  whitespace: '%s不能为空白'
+  whitespace: '${label}不能为空白'
 }
 ```
 
@@ -197,35 +197,35 @@ export default {
       INVALID: '请输入有效的日期',
       PARSE: '请输入有效的日期'
     },
-    DEFAULT: '%s验证失败',
-    ENUM: '%s必须是以下值之一[%s]',
+    DEFAULT: '${label}验证失败',
+    ENUM: '${label}必须是以下值之一[${$ctx["enum"]}]',
     NUMBER: {
-      LEN: '%s的长度必须为%s',
-      MAX: '%s的长度不能超过%s',
-      MIN: '%s的长度不能小于%s',
-      RANGE: '请输入有效的%s(%s-%s)！'
+      LEN: '${label}的长度必须为${len}',
+      MAX: '${label}的值不能超过${max}',
+      MIN: '${label}的值不能小于${min}',
+      RANGE: '请输入有效的${label}(${min}-${max})！'
     },
     PATTERN: {
-      MISMATCH: '请输入正确的%s！'
+      MISMATCH: '请输入正确的${label}！'
     },
-    REQUIRED: '请输入%s！',
+    REQUIRED: '请输入${label}！',
     STRING: {
-      LEN: '%s的长度必须为%s',
-      MAX: '%s的长度不能超过%s',
-      MIN: '%s的长度不能小于%s',
-      RANGE: '请输入有效的%s(%s-%s)！'
+      LEN: '${label}的长度必须为${len}',
+      MAX: '${label}的长度不能超过${max}',
+      MIN: '${label}的长度不能小于${min}',
+      RANGE: '请输入有效的${label}(${min}-${max})！'
     },
     TYPES: {
-      ARRAY: '%s必须是数组',
-      DATE: '%s必须是日期',
-      EMAIL: '%s必须是网络邮箱地址',
-      FLOAT: '%s必须是浮点数',
-      INTEGER: '%s必须是整数',
-      NUMBER: '%s必须是数字',
-      STRING: '%s必须是文本',
-      URL: '%s必须是URL'
+      ARRAY: '${label}必须是数组',
+      DATE: '${label}必须是日期',
+      EMAIL: '${label}必须是网络邮箱地址',
+      FLOAT: '${label}必须是浮点数',
+      INTEGER: '${label}必须是整数',
+      NUMBER: '${label}必须是数字',
+      STRING: '${label}必须是文本',
+      URL: '${label}必须是URL'
     },
-    WHITESPACE: '%s不能为空白'
+    WHITESPACE: '${label}不能为空白'
   }
   ...
 }
