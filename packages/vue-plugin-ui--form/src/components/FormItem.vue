@@ -138,8 +138,10 @@ export default defineComponent({
           const rule = validateError.rule
           const data = Object.assign(rule, {
             label: this.label,
-            value: this.fieldValue
+            value: this.fieldValue,
+            $ctx: {}
           })
+          data.$ctx = data
           const compiled = template(validateError.message, {
             imports: {
               t: (key: string) => template(this.$t(key))(data)

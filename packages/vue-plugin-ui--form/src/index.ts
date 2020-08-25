@@ -1,4 +1,4 @@
-import { App, h } from 'vue'
+import { App, h, defineComponent } from 'vue'
 import Form from './components/Form.vue'
 import FormItem from './components/FormItem.vue'
 import componentsOptions from './config/components-options'
@@ -19,23 +19,23 @@ export default function (app: App, options: FormOptions) {
     Object.assign(componentsOptions.validator.messages, options.validator.messages)
   }
 
-  app.component(options.name || 'UForm', {
-    setup (props: any, context: any) {
+  app.component(options.name || 'UForm', defineComponent({
+    setup (props, context) {
       return () => h(Form, {
         i18n: options.i18n,
         i18nMessages: options.i18nMessages,
         ...props
       }, context.slots)
     }
-  }).component(options.name || 'UFormItem', {
-    setup (props: any, context: any) {
+  })).component(options.name || 'UFormItem', defineComponent({
+    setup (props, context) {
       return () => h(FormItem, {
         i18n: options.i18n,
         i18nMessages: options.i18nMessages,
         ...props
       }, context.slots)
     }
-  })
+  }))
 }
 
 const formatRegExp = /%[sdj%]/g
@@ -77,6 +77,6 @@ function format (f: string, args: (string | number)[]) {
 export function defaultMessagesI18nWrapper (i18n: Function) {
   const { $t: t } = i18n()
   return (key: string) => {
-    return (...args: any[]) => format(t(key), args)
+    return (...args: (string | number)[]) => format(t(key), args)
   }
 }
