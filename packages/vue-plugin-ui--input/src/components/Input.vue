@@ -140,7 +140,7 @@ export default defineComponent({
       return this.value || this.modelValue
     },
     validating (): boolean {
-      return (this.$parent?.$data as { validateState: string }).validateState === 'validating'
+      return this.formItem && this.formItem.validateState === 'validating'
     },
     textareaStyle (): object {
       return merge({}, this.textareaCalcStyle, { resize: this.resize })
