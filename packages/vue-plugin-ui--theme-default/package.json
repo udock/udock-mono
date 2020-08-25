@@ -3,9 +3,7 @@
   "description": "@udock/vue-plugin-ui--theme-default",
   "version": "3.0.0",
   "files": [
-    "dist",
-    "src/scss",
-    "src/fonts"
+    "src"
   ],
   "main": "src/scss/index.scss",
   "scripts": {
