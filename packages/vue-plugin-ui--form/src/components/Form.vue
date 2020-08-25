@@ -101,7 +101,7 @@ export default defineComponent({
         return
       }
       const allItemError: object[] = []
-      this.fields.forEach((field, index) => {
+      this.fields.forEach((field) => {
         field.validate('', (itemError: object) => {
           if (itemError) {
             allItemError.push(itemError)
