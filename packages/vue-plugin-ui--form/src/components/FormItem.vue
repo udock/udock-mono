@@ -32,22 +32,12 @@ import isObject from 'lodash/isObject'
 import isFunction from 'lodash/isFunction'
 import noop from 'lodash/noop'
 import componentsOptions from '../config/components-options'
-import AsyncValidator, { RuleItem } from 'async-validator'
+import AsyncValidator, { RuleItem, ValidateError } from '@udock/async-validator'
 import get from 'lodash/get'
 
-type ValidateError = {
-  label?: string;
-  message?: {
-    data: object;
-    value: string;
-  };
-}
-
-type Validator = (rule: Rule, value: object, callback: Function, source: object, options: object) => void
-
-type Rule = {
-  required: boolean;
-  validator: Validator;
+type RuleItemEx = RuleItem & {
+  trigger: string;
+  label: string;
   revalidate: string[];
 }
 
@@ -143,28 +133,25 @@ export default defineComponent({
     validateMessage: {
       get (): string {
         if (this.validateState === 'success') return ''
-        const rule = this.validateError
-        if (rule && rule.message) {
-          if (isObject(rule.message)) {
-            const r = rule.message.data
-            const compiled = template(rule.message.value, {
-              imports: {
-                t: (key: string) => template(this.$t(key))(r)
-              }
-            })
-            return compiled(r)
-          } else {
-            return rule.message
-          }
+        const validateError = this.validateError
+        if (validateError && validateError.message) {
+          const rule = validateError.rule
+          const data = Object.assign(rule, {
+            label: this.label,
+            value: this.fieldValue
+          })
+          const compiled = template(validateError.message, {
+            imports: {
+              t: (key: string) => template(this.$t(key))(data)
+            }
+          })
+          return compiled(data)
         }
         return ''
       },
       set (v: string) {
         if (this.validateError) {
-          this.validateError.message = {
-            data: {},
-            value: v
-          }
+          this.validateError.message = v
         }
       }
     },
@@ -202,7 +189,7 @@ export default defineComponent({
   },
   data () {
     return {
-      mergedRules: [],
+      mergedRules: [] as RuleItemEx[],
       validateState: '',
       validateDisabled: false,
       validator: {},
@@ -210,6 +197,7 @@ export default defineComponent({
       validateError: {},
       silent: false
     } as {
+      mergedRules: RuleItemEx[];
       validateState: string;
       validateDisabled: boolean;
       validator: object;
@@ -275,7 +263,7 @@ export default defineComponent({
     formatArray (v = []) {
       return !Array.isArray(v) && isObject(v) ? [v] : v
     },
-    getRules (): (RuleItem & { trigger: string; label: string })[] {
+    getRules (): RuleItemEx[] {
       return this.mergedRules
     },
     getFilteredRule (trigger: string): RuleItem[] {
@@ -285,13 +273,6 @@ export default defineComponent({
       }).map((rule) => {
         rule = { ...rule }
         rule.label = this.label || ''
-        if (rule.message) {
-          rule.message = {
-            data: rule,
-            value: rule.message
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any
-        }
         return rule
       })
     },
@@ -316,14 +297,14 @@ export default defineComponent({
       Object.defineProperty(this, 'initialValue', {
         value: initialValue
       })
-      const rules: Rule[] = this.mergedRules = this.formatArray(this.rules || get(this.form.computedRules, this.prop))
+      const rules: RuleItemEx[] = this.mergedRules = this.formatArray(this.rules || get(this.form.computedRules, this.prop))
       if (rules.length === 0 && process.env.NODE_ENV !== 'production') typeof console !== 'undefined' && console.warn(`[@udock/vue-plugin-ui--from] "${this.prop}" rule not found`)
       rules.forEach((rule) => {
         if (rule.validator) {
           rule.validator = rule.validator.bind(this.form)
         } else if (rule.revalidate) {
-          rule.validator = (rule: Rule, value, callback) => {
-            let revalidate = rule.revalidate
+          rule.validator = (rule, value, callback) => {
+            let revalidate = (rule as RuleItemEx).revalidate
             if (isFunction(revalidate)) {
               revalidate = revalidate(this.form.model) || []
             }
