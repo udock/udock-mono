@@ -38,6 +38,10 @@ export default defineComponent({
     },
     contentClass: {
       type: String
+    },
+    hideRequiredAsterisk: {
+      type: Boolean,
+      default: false
     }
   },
 

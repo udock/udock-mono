@@ -13,7 +13,6 @@ export default function (app: App, options: any) {
           (formItem as typeof formItem & { elFormItemSize: number }).elFormItemSize = formItem.formItemSize
         }
       })
-
       return () => h(Input, {
         ...context.attrs,
         ...eventHandlers

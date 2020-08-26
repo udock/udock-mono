@@ -9,13 +9,13 @@
     },
     sizeClass ? 'u-form-item--' + sizeClass : ''
   ]">
-    <label-wrap
+    <LabelWrap
       :is-auto-width="labelStyle && labelStyle.width === 'auto'"
       :update-all="form$.labelWidth === 'auto'">
       <label :for="labelFor" class="u-form-item__label" :style="labelStyle" v-if="label || $slots.label">
         <slot name="label">{{label + form$.labelSuffix}}</slot>
       </label>
-    </label-wrap>
+    </LabelWrap>
     <div class="u-form-item__content" :style="contentStyle">
       <slot></slot>
       <transition name="el-zoom-in-top">
@@ -50,6 +50,7 @@ import noop from 'lodash/noop'
 import componentsOptions from '../config/components-options'
 import AsyncValidator, { RuleItem, ValidateError } from '@udock/async-validator'
 import get from 'lodash/get'
+import LabelWrap from './LabelWrap.vue'
 
 type RuleItemEx = RuleItem & {
   trigger: string;
@@ -82,6 +83,9 @@ function getPropByPath (obj: object, path: string) {
 export default defineComponent({
   name: 'UFormItem',
   componentName: 'UFormItem',
+  components: {
+    LabelWrap
+  },
   props: {
     label: String,
     labelWidth: String,
@@ -110,7 +114,8 @@ export default defineComponent({
     },
     contentClass: {
       type: String
-    }
+    },
+    for: String
   },
 
   provide () {
@@ -142,7 +147,8 @@ export default defineComponent({
       }),
       formItemSize: 0,
       disabled: false,
-      initialValue: []
+      initialValue: [],
+      $ELEMENT: {}
     }
   },
 
@@ -214,6 +220,12 @@ export default defineComponent({
         return getPropByPath(model, path).v
       },
       set () { /* */ }
+    },
+    sizeClass (): string {
+      return this.formItemSize || (this.$ELEMENT || {}).size
+    },
+    labelFor (): string {
+      return this.for || this.prop
     }
   },
   data () {

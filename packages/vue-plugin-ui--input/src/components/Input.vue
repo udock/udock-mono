@@ -61,7 +61,7 @@
             </i>
           </template>
           <i v-if="showClear"
-            class="u-input__icon u-icon-circle-close u-input__clear"
+            class="u-icon u-input__icon u-icon-close-circled u-input__clear"
             @mousedown.prevent
             @click="clear"
           ></i>
@@ -79,9 +79,6 @@
           v-if="validateState"
           :class="['u-input__validateIcon', validateIcon]">
         </i>
-        <!-- <i class="u-icon u-input__icon u-input__validateIcon u-icon-load-c"
-          v-if="validateState"
-        ></i> -->
       </span>
       <!-- 后置元素 -->
       <div class="u-input-group__append" v-if="$slots.append">
@@ -253,10 +250,10 @@ export default defineComponent({
     },
     showClear (): boolean {
       return this.clearable &&
-        !this.inputDisabled &&
-        !this.readonly &&
-        !!this.nativeInputValue &&
-        (this.focused || this.hovering)
+      !this.inputDisabled &&
+      !this.readonly &&
+      !!(this.value || this.modelValue || this.nativeInputValue) &&
+      (this.focused || this.hovering)
     },
     showPwdVisible (): boolean {
       return this.showPassword &&
@@ -429,6 +426,7 @@ export default defineComponent({
     clear () {
       this.$emit('input', '')
       this.$emit('change', '')
+      this.$emit('update:modelValue', '')
       this.$emit('clear')
     },
     handlePasswordVisible () {
@@ -452,9 +450,6 @@ export default defineComponent({
     this.setNativeInputValue()
     this.resizeTextarea()
     this.updateIconOffset()
-
-    console.log('elFormItem: ', this.elFormItem)
-    console.log('elForm: ', this.elForm)
   },
 
   updated () {
