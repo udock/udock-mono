@@ -1,17 +1,17 @@
 <template>
   <div class="u-form-item" :class="{
-    'is-error': validateState === 'error' && !silent && !form.customizeError && !customizeError,
-    'is-customize-error': validateState === 'error' && (form.customizeError || customizeError),
+    'is-error': validateState === 'error' && !silent && !form$.customizeError && !customizeError,
+    'is-customize-error': validateState === 'error' && (form$.customizeError || customizeError),
     'is-validating ivu-form-item-validating': validateState === 'validating',
     'is-required': isRequired || required
   }">
-    <label :for="prop" class="u-form-item__label" :class="labelClass || form.labelClass" v-bind:style="labelStyle" v-if="label">
-      <slot name="label">{{label + form.labelSuffix}}</slot>
+    <label :for="prop" class="u-form-item__label" :class="labelClass || form$.labelClass" v-bind:style="labelStyle" v-if="label">
+      <slot name="label">{{label + form$.labelSuffix}}</slot>
     </label>
-    <div class="u-form-item__content" :class="contentClass || form.contentClass" v-bind:style="contentStyle">
+    <div class="u-form-item__content" :class="contentClass || form$.contentClass" v-bind:style="contentStyle">
       <slot></slot>
       <transition name="el-zoom-in-top">
-        <div v-if="validateState === 'error' && showMessage && form.showMessage">
+        <div v-if="validateState === 'error' && showMessage && form$.showMessage">
           <div
             class="u-form-item__error u-form-item__custom-error"
             v-if="$slots.customError">
@@ -25,7 +25,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
+import { i18nFallback } from '@udock/vue-plugin-ui'
 import defaultMessages from '../i18n/langs'
 import template from 'lodash/template'
 import isObject from 'lodash/isObject'
@@ -67,11 +68,6 @@ export default defineComponent({
   name: 'UFormItem',
   componentName: 'UFormItem',
   props: {
-    i18n: {
-      type: Function,
-      required: true
-    },
-    i18nMessages: Object,
     label: String,
     labelWidth: String,
     prop: {
@@ -107,15 +103,31 @@ export default defineComponent({
       '#UFormItem': this
     }
   },
-  inject: {
-    form: '#UForm'
-  },
 
-  setup (props) {
+  setup () {
+    const { i18n, messages } = inject('i18n', i18nFallback)
+    type ResolveItem = (error: any) => void
+    type AddField = (field: any) => void
+    type RemoveField = (field: any) => void
+    type ValidateField = (prop: string, cb?: Function, options?: object) => void
     return {
-      ...props.i18n({
-        messages: props.i18nMessages || defaultMessages
-      })
+      form$: inject<{
+        resolveItem: ResolveItem;
+        labelPosition: string;
+        addField: AddField;
+        removeField: RemoveField;
+        inline: boolean;
+        labelWidth: number;
+        model: any;
+        computedRules: RuleItem[];
+        validateField: ValidateField;
+      }>('#UForm', {} as any),
+      ...i18n({
+        messages: messages || defaultMessages
+      }),
+      formItemSize: 0,
+      disabled: false,
+      initialValue: []
     }
   },
 
@@ -158,18 +170,18 @@ export default defineComponent({
       }
     },
     labelStyle () {
-      const ret: { width?: string } = {}
-      if (this.form.labelPosition === 'top') return ret
-      const labelWidth = this.labelWidth || this.form.labelWidth
+      const ret: { width?: string | number } = {}
+      if (this.form$.labelPosition === 'top') return ret
+      const labelWidth = this.labelWidth || this.form$.labelWidth
       if (labelWidth) {
         ret.width = labelWidth
       }
       return ret
     },
     contentStyle () {
-      const ret: { marginLeft?: string } = {}
-      if (this.form.labelPosition === 'top' || this.form.inline) return ret
-      const labelWidth = this.labelWidth || this.form.labelWidth
+      const ret: { marginLeft?: string | number } = {}
+      if (this.form$.labelPosition === 'top' || this.form$.inline) return ret
+      const labelWidth = this.labelWidth || this.form$.labelWidth
       if (labelWidth) {
         ret.marginLeft = labelWidth
       }
@@ -178,7 +190,7 @@ export default defineComponent({
     fieldValue: {
       cache: false,
       get (): object | undefined {
-        const model = this.form.model
+        const model = this.form$.model
         if (!model || !this.prop) { return }
         let path = this.prop
         if (path.indexOf(':') !== -1) {
@@ -216,7 +228,7 @@ export default defineComponent({
       const rules = this.getFilteredRule(trigger)
       trigger = trigger || options.trigger || ''
       const cb = (error: { message: string; trigger: string; vm: object } | null) => {
-        if (!options.silent) this.form.resolveItem(error)
+        if (!options.silent) this.form$.resolveItem(error)
         callback(error)
       }
       if (!rules || rules.length === 0) {
@@ -247,7 +259,7 @@ export default defineComponent({
     resetField () {
       this.validateState = ''
       this.validateMessage = ''
-      const model = this.form.model
+      const model = this.form$.model
       const value = this.fieldValue
       let path = this.prop
       if (path.indexOf(':') !== -1) {
@@ -278,20 +290,17 @@ export default defineComponent({
         return rule
       })
     },
-    onFieldBlur () {
-      this.validate('blur')
-    },
-    onFieldChange () {
+    onValidate (trigger: string) {
       if (this.validateDisabled) {
         this.validateDisabled = false
         return
       }
-      this.validate('change')
+      this.validate(trigger)
     }
   },
   mounted () {
     if (this.prop) {
-      this.form.addField(this)
+      this.form$.addField(this)
       let initialValue = this.fieldValue
       if (Array.isArray(initialValue)) {
         initialValue = [...initialValue]
@@ -299,20 +308,20 @@ export default defineComponent({
       Object.defineProperty(this, 'initialValue', {
         value: initialValue
       })
-      const rules: RuleItemEx[] = this.mergedRules = this.formatArray(this.rules || get(this.form.computedRules, this.prop))
+      const rules: RuleItemEx[] = this.mergedRules = this.formatArray(this.rules || get(this.form$.computedRules, this.prop))
       if (rules.length === 0 && process.env.NODE_ENV !== 'production') typeof console !== 'undefined' && console.warn(`[@udock/vue-plugin-ui--from] "${this.prop}" rule not found`)
       rules.forEach((rule) => {
         if (rule.validator) {
-          rule.validator = rule.validator.bind(this.form)
+          rule.validator = rule.validator.bind(this.form$)
         } else if (rule.revalidate) {
           rule.validator = (rule, value, callback) => {
             let revalidate = (rule as RuleItemEx).revalidate
             if (isFunction(revalidate)) {
-              revalidate = revalidate(this.form.model) || []
+              revalidate = revalidate(this.form$.model) || []
             }
             if (!Array.isArray(revalidate)) { revalidate = [revalidate] }
             revalidate.forEach((r) => {
-              this.formValidateField(r)
+              this.form$.validateField(r)
             })
             callback()
           }
@@ -329,7 +338,7 @@ export default defineComponent({
     }
   },
   beforeUnmount () {
-    this.form.removeField(this)
+    this.form$.removeField(this)
   }
 })
 </script>

@@ -10,6 +10,9 @@
     "template": "template"
   },
   "main": "src/index.ts",
+  "dependencies": {
+    "@udock/vue-plugin-ui": "^3.0.0"
+  },
   "peerDependencies": {
     "vue": "^3.0.0-rc.5"
   },

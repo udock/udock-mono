@@ -8,9 +8,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, inject } from 'vue'
 import FormItem from './FormItem.vue'
+import { i18nFallback } from '@udock/vue-plugin-ui'
 import componentsOptions from '../config/components-options'
-import { defineComponent } from 'vue'
 import defaultMessages from '../i18n/langs'
 
 export default defineComponent({
@@ -18,11 +19,6 @@ export default defineComponent({
   componentName: 'UForm',
 
   props: {
-    i18n: {
-      type: Function,
-      required: true
-    },
-    i18nMessages: Object,
     model: Object,
     rules: Object,
     labelPosition: String,
@@ -51,11 +47,13 @@ export default defineComponent({
     }
   },
 
-  setup (props, context) {
+  setup () {
+    const { i18n, messages } = inject('i18n', i18nFallback)
     return {
-      ...props.i18n({
-        messages: props.i18nMessages || defaultMessages
-      })
+      ...i18n({
+        messages: messages || defaultMessages
+      }),
+      statusIcon: true
     }
   },
   watch: {
@@ -112,7 +110,7 @@ export default defineComponent({
         }, Object.assign({ trigger: 'form', silent: false }, options))
       })
     },
-    validateField (prop: string, cb: Function, options: object) {
+    validateField (prop: string, cb?: Function, options?: object) {
       const field = this.fields.filter(field => field.prop === prop)[0]
       if (!field) { throw new Error('must call validateField with valid prop string!') }
       field.validate('', cb, Object.assign({ trigger: 'field' }, options))

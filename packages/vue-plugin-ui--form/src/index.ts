@@ -1,4 +1,4 @@
-import { App, h, defineComponent } from 'vue'
+import { App } from 'vue'
 import Form from './components/Form.vue'
 import FormItem from './components/FormItem.vue'
 import componentsOptions from './config/components-options'
@@ -19,23 +19,9 @@ export default function (app: App, options: FormOptions) {
     Object.assign(componentsOptions.validator.messages, options.validator.messages)
   }
 
-  app.component(options.name || 'UForm', defineComponent({
-    setup (props, context) {
-      return () => h(Form, {
-        i18n: options.i18n,
-        i18nMessages: options.i18nMessages,
-        ...props
-      }, context.slots)
-    }
-  })).component(options.name || 'UFormItem', defineComponent({
-    setup (props, context) {
-      return () => h(FormItem, {
-        i18n: options.i18n,
-        i18nMessages: options.i18nMessages,
-        ...props
-      }, context.slots)
-    }
-  }))
+  app
+    .component(options.name || 'UForm', Form)
+    .component(options.name || 'UFormItem', FormItem)
 }
 
 const formatRegExp = /%[sdj%]/g
