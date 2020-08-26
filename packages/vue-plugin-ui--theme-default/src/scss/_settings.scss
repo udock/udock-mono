@@ -1,229 +1,4 @@
-// 方法扩展
-@function tint($color, $percentage) {
-  @return mix(white, $color, $percentage);
-}
-@function shade($color, $percentage) {
-  @return mix(black, $color, $percentage);
-}
-@function fade($color, $percentage) {
-  @return rgba($color, $percentage);
-}
-
-// Prefix
-$css-prefix             : u-;
-// $css-mobile-prefix      : um-;
-
-// Base
-$primary-color          : #3399ff!default;
-$subsidiary-color       : #80848f!default;
-$info-color             : #2db7f5!default;
-$success-color          : #00cc66!default;
-$warning-color          : #ff9900!default;
-$error-color            : #ff3300!default;
-$selected-color         : fade($primary-color, 90%)!default;
-$disabled-color         : #f3f3f3!default;
-
-$cursor-disabled        : not-allowed!default;
-
-$status-error-cls       : is-error!default;
-
-// Background
-$background-color-base  : #f7f7f7!default;  // base
-
-// Text
-$title-color            : #464c5b!default;
-$text-color             : #657180!default;
-
-$link-color-base        : #3399ff!default;
-$link-hover-color       : tint($link-color-base, 20%)!default;
-$link-active-color      : shade($link-color-base, 5%)!default;
-
-$font-family            : "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif!default;
-$code-family            : Consolas,Menlo,Courier,monospace!default;
-$font-size-base         : 14px!default;
-$font-size-small        : 12px!default;
-// $font-size-large        : 16px!default;
-
-$line-height-base       : 1.5!default;
-
-// Border
-$border-color-base      : #d7dde4!default;  // outside
-// $border-color-split     : #e3e8ee!default;  // inside
-$border-radius-base     : 6px!default;
-// $border-radius-small    : 4px!default;
-
-// Shadow
-$shadow-color           : rgba(0, 0, 0, .2)!default;
-$shadow-base            : 0 1px 6px $shadow-color!default;
-$shadow-card            : 0 1px 1px 0 rgba(0,0,0,.1)!default;
-$shadow-up              : 0 -1px 6px $shadow-color!default;
-$shadow-down            : $shadow-base!default;
-$shadow-left            : -1px 0 6px $shadow-color!default;
-$shadow-right           : 1px 0 6px $shadow-color!default;
-
-// Animation
-$animation-time         : .3s!default;
-$transition-time        : .2s!default;
-$ease-in-out            : ease-in-out!default;
-
-// Media queries breakpoints
-$screen-support         : (
-  // xs: true,
-  // sm: true,
-  // md: true,
-  // lg: true
-)!default;
-// Extra small screen / phone
-$screen-xs              : 480px!default;
-$screen-xs-min          : $screen-xs!default;
-$screen-xs-max          : ($screen-xs-min - 1)!default;
-
-// Small screen / tablet
-$screen-sm              : 768px!default;
-$screen-sm-min          : $screen-sm!default;
-$screen-sm-max          : ($screen-sm-min - 1)!default;
-
-// Medium screen / desktop
-$screen-md              : 992px!default;
-$screen-md-min          : $screen-md!default;
-$screen-md-max          : ($screen-md-min - 1)!default;
-
-// Large screen / wide desktop
-$screen-lg              : 1200px!default;
-$screen-lg-min          : $screen-lg!default;
-$screen-lg-max          : ($screen-lg-min - 1)!default;
-
-// 组件配置
-
-// 图标配置
-// $ui-icon-font-family: #{$css-prefix}icons!default;
-// $ui-icon-font-path: "~@udock/vue-plugin-ui--theme-default/src/fonts/#{$css-prefix}icons"!default;
-// $ui-icon-font-version: "1.0.0"!default;
-// $ui-icon-is-extend: false!default;
-// $ui-icon-cls: #{$css-prefix}icon!default;
-
-// 栅格配置
-// $ui-grid-columns:24!default;
-// $ui-grid-gutter-width: 0!default;
-// $ui-grid-screen-support: (
-//   xs: true,
-//   sm: true,
-//   md: true,
-//   lg: true,
-// )!default;
-
-// 项目配置
-$head-bg                      : #f9fafc!default;
-
-// Z-index
-// $zindex-spin            : 8!default;
-// $zindex-affix           : 10!default;
-// $zindex-back-top        : 10!default;
-// $zindex-select          : 900!default;
-// $zindex-modal           : 1000!default;
-// $zindex-message         : 1010!default;
-// $zindex-notification    : 1010!default;
-// $zindex-tooltip         : 1060!default;
-// $zindex-transfer        : 1060!default;
-// $zindex-loading-bar     : 2000!default;
-
-// $tooltip-bg                   : rgba(70, 76, 91, .9)!default;
-// $table-thead-bg               : #f8f8f9!default;
-// $table-td-stripe-bg           : #f8f8f9!default;
-// $table-td-hover-bg            : #ebf7ff!default;
-// $table-td-highlight-bg        : #ebf7ff!default;
-// $menu-dark-title              : #495060!default;
-// $menu-dark-active-bg          : #363e4f!default;
-// $menu-dark-subsidiary-color   : rgba(255,255,255,.7)!default;
-// $menu-dark-group-title-color  : rgba(255,255,255,.36)!default;
-// $date-picker-cell-hover-bg    : #e1f0fe!default;
-
-// // Button
-// $btn-font-weight        : normal!default;
-// $btn-padding-base       : 6px 15px!default;
-// $btn-padding-large      : 6px 15px 7px 15px!default;
-// $btn-padding-small      : 2px 7px!default;
-// $btn-font-size          : 12px!default;
-// $btn-font-size-large    : 14px!default;
-// $btn-border-radius      : 4px!default;
-// $btn-border-radius-small: 3px!default;
-// $btn-group-border       : shade($primary-color, 5%)!default;
-
-// $btn-disable-color      : #bbbec4!default;
-// $btn-disable-bg         : $background-color-base!default;
-// $btn-disable-border     : $border-color-base!default;
-
-// $btn-default-color      : $text-color!default;
-// $btn-default-bg         : $background-color-base!default;
-// $btn-default-border     : $border-color-base!default;
-
-// $btn-primary-color      : #fff!default;
-// $btn-primary-bg         : $primary-color!default;
-
-// $btn-ghost-color        : $text-color!default;
-// $btn-ghost-bg           : transparent!default;
-// $btn-ghost-border       : $border-color-base!default;
-
-// $btn-circle-size        : 32px!default;
-// $btn-circle-size-large  : 36px!default;
-// $btn-circle-size-small  : 24px!default;
-
-// // Layout and Grid
-// $grid-columns           : 24!default;
-// $grid-gutter-width      : 0!default;
-
-// // Legend
-// $legend-color           : #999!default;
-
-// // Input
-// $input-height-base           : 32px!default;
-// $input-height-large          : 36px!default;
-// $input-height-small          : 24px!default;
-
-// $input-padding-horizontal    : 7px!default;
-// $input-padding-vertical-base : 4px!default;
-// $input-padding-vertical-small: 1px!default;
-// $input-padding-vertical-large: 6px!default;
-
-// $input-placeholder-color     : $btn-disable-color!default;
-// $input-color                 : $text-color!default;
-// $input-border-color          : $border-color-base!default;
-// $input-bg                    : #fff!default;
-
-// $input-hover-border-color    : $primary-color!default;
-// $input-focus-border-color    : $primary-color!default;
-// $input-disabled-bg           : #f3f3f3!default;
-
-// // Tag
-// $tag-font-size          : 12px!default;
-
-// // Slider
-// $slider-color              : tint($primary-color, 20%)!default;
-// $slider-height             : 4px!default;
-// $slider-margin             : 16px 0!default;
-// $slider-button-wrap-size   : 18px!default;
-// $slider-button-wrap-offset : -4px!default;
-// $slider-disabled-color     : #ccc!default;
-
-// // Avatar
-// $avatar-size-base: 32px!default;
-// $avatar-size-lg: 40px!default;
-// $avatar-size-sm: 24px!default;
-// $avatar-font-size-base: 18px!default;
-// $avatar-font-size-lg: 24px!default;
-// $avatar-font-size-sm: 14px!default;
-// $avatar-bg: #ccc!default;
-// $avatar-color: #fff!default;
-// $avatar-border-radius: $border-radius-small!default;
-
-// // other Prefix
-// $modal-prefix-cls: #{$css-prefix}modal!default; // 暂定，用处有实现modal嵌套select时修正select的定位方式
-// $error-prefix-cls: is-error!default; // 暂定，用于实现form组件下各输入组件验证错误时展示错误样式
-
-// $state-is-error-cls
-
 /* Element Chalk Variables */
-
 // Special comment for theme configurator
 // type|skipAutoTranslation|Category|Order
 // skipAutoTranslation 1
@@ -236,6 +11,7 @@ $--fade-linear-transition: opacity 200ms linear !default;
 $--md-fade-transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1), opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) !default;
 $--border-transition-base: border-color .2s cubic-bezier(.645,.045,.355,1) !default;
 $--color-transition-base: color .2s cubic-bezier(.645,.045,.355,1) !default;
+$--transition-time: .3s !default;
 
 /* Color
 -------------------------- */
@@ -327,6 +103,7 @@ $--fill-base: $--color-white !default;
 
 /* Typography
 -------------------------- */
+$--font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif !default;
 $--font-path: 'fonts' !default;
 $--font-display: 'auto' !default;
 /// fontSize|1|Font Size|0
@@ -1216,3 +993,8 @@ $--breakpoints-spec: (
   'lg-and-down': (max-width: $--xl - 1),
   'xl-only' : (min-width: $--xl),
 );
+
+$--body-bg-color: $--color-white !default;
+$--body-text-color: $--color-text-primary !default;
+$--code-font-family: Consolas,Menlo,Courier,monospace !default;
+$--cursor-disabled: not-allowed!default;

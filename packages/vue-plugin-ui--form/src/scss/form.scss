@@ -1,91 +1,163 @@
-.#{$ui-form-item-cls} {
-  margin-bottom:22px;
-
-  &:after {
-    clear:both
+@include b($ui-form-cls) {
+  @include m(label-left) {
+    & .#{$namespace}-#{$ui-form-item-cls}__label {
+      text-align: left;
+    }
   }
-  &:after,
-  &:before {
-    display:table;
-    content:""
+  @include m(label-top) {
+    & .#{$namespace}-#{$ui-form-item-cls}__label {
+      float: none;
+      display: inline-block;
+      text-align: left;
+      padding: 0 0 10px 0;
+    }
   }
-  .#{$ui-form-item-cls}{ margin-bottom:0 }
-}
-
-.#{$ui-form-item-cls} {
-  &.is-error {
-    .el-input-group__append .el-input__inner,
-    .el-input-group__prepend .el-input__inner,
-    .el-input__inner{ border-color:transparent }
-  }
-  &.is-error {
-    .#{$css-prefix}input-group__append .#{$css-prefix}input__inner,
-    .#{$css-prefix}input-group__prepend .#{$css-prefix}input__inner,
-    .#{$css-prefix}input__inner{ border-color:transparent }
-  }
-}
-
-.#{$ui-form-cls}--inline {
-  .#{$ui-form-item-cls}, .#{$ui-form-item-cls}__content {
-    display:inline-block;
-    vertical-align:top;
-  }
-  .#{$ui-form-item-cls}{ margin-right:10px }
-  &.#{$ui-form-cls}--label-top .#{$ui-form-item-cls}__content{ display:block }
-}
-
-.#{$ui-form-item-cls}__content {
-  &:after{ clear:both }
-}
-
-.#{$ui-form-item-cls}.is-error {
-  .el-input__inner,.el-textarea__inner,.ivu-input{ border-color:$error-color }
-  .#{$css-prefix}input__inner,.#{$css-prefix}textarea__inner,.ivu-input{ border-color:$error-color }
-}
-.#{$ui-form-item-cls}.is-required .#{$ui-form-item-cls}__label:before{
-  content:'*';
-  color:$error-color;
-  margin-right:4px
-}
-.#{$ui-form-cls}--label-left .#{$ui-form-item-cls}__label{ text-align:left }
-.#{$ui-form-cls}--label-top .#{$ui-form-item-cls}__label{
-  float:none;
-  display:inline-block;
-  text-align:left;
-  padding:0 0 10px
-}
-.#{$ui-form-cls}--inline .#{$ui-form-item-cls}__label{
-  float:none;
-  display:inline-block
-}
-.#{$ui-form-item-cls}__label{
-  text-align:right;
-  vertical-align:middle;
-  float:left;
-  font-size:12px;
-  color:$text-color;
-  line-height:1;
-  padding:11px 12px 11px 0;
-  box-sizing:border-box
-}
-.#{$ui-form-item-cls}__content{
-  line-height:36px;
-  position:relative;
-  font-size:14px;
-
-  &:after,
-  &:before {
-    display:table;
-    content:""
+  @include m(inline) {
+    & .#{$namespace}-#{$ui-form-item-cls} {
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+    }
+    & .#{$namespace}-#{$ui-form-item-cls}__label {
+      float: none;
+      display: inline-block;
+    }
+    & .#{$namespace}-#{$ui-form-item-cls}__content {
+      display: inline-block;
+      vertical-align: top;
+    }
+    &.#{$namespace}-form--label-top .#{$namespace}-#{$ui-form-item-cls}__content {
+      display: block;
+    }
   }
 }
+@include b(#{$ui-form-item-cls}) {
+  margin-bottom: 22px;
+  @include utils-clearfix;
 
-.#{$ui-form-item-cls}__error {
-  color: $error-color;
-  font-size: 12px;
-  padding-top: 4px;
-  position: absolute;
-  line-height: 12px;
-  top: 100%;
-  left: 0;
+  & .#{$namespace}-#{$ui-form-item-cls} {
+    margin-bottom: 0;
+  }
+
+  & .#{$namespace}-input__validateIcon {
+    display: none;
+  }
+
+  @include m(medium) {
+    .#{$namespace}-#{$ui-form-item-cls}__label {
+      line-height: 36px;
+    }
+    .#{$namespace}-#{$ui-form-item-cls}__content {
+      line-height: 36px;
+    }
+  }
+  @include m(small) {
+    .#{$namespace}-#{$ui-form-item-cls}__label {
+      line-height: 32px;
+    }
+    .#{$namespace}-#{$ui-form-item-cls}__content {
+      line-height: 32px;
+    }
+    &.#{$namespace}-#{$ui-form-item-cls} {
+      margin-bottom: 18px;
+    }
+    .#{$namespace}-#{$ui-form-item-cls}__error {
+      padding-top: 2px;
+    }
+  }
+  @include m(mini) {
+    .#{$namespace}-#{$ui-form-item-cls}__label {
+      line-height: 28px;
+    }
+    .#{$namespace}-#{$ui-form-item-cls}__content {
+      line-height: 28px;
+    }
+    &.#{$namespace}-#{$ui-form-item-cls} {
+      margin-bottom: 18px;
+    }
+    .#{$namespace}-#{$ui-form-item-cls}__error {
+      padding-top: 1px;
+    }
+  }
+
+  @include e(label-wrap) {
+    float: left;
+    .#{$namespace}-#{$ui-form-item-cls}__label {
+      display: inline-block;
+      float: none;
+    }
+  }
+
+  @include e(label) {
+    text-align: right;
+    vertical-align: middle;
+    float: left;
+    font-size: $--form-label-font-size;
+    color: $--color-text-regular;
+    line-height: 40px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+  }
+  @include e(content) {
+    line-height: 40px;
+    position: relative;
+    font-size: 14px;
+    @include utils-clearfix;
+
+    .#{$namespace}-input-group {
+      vertical-align: top;
+    }
+  }
+  @include e(error) {
+    color: $--color-danger;
+    font-size: 12px;
+    line-height: 1;
+    padding-top: 4px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+
+    @include m(inline) {
+      position: relative;
+      top: auto;
+      left: auto;
+      display: inline-block;
+      margin-left: 10px;
+    }
+  }
+
+  @include when(required) {
+    @include pseudo('not(.is-no-asterisk)') {
+      & > .#{$namespace}-#{$ui-form-item-cls}__label:before,
+      & .#{$namespace}-#{$ui-form-item-cls}__label-wrap > .#{$namespace}-#{$ui-form-item-cls}__label:before {
+        content: '*';
+        color: $--color-danger;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  @include when(error) {
+    & .#{$namespace}-input__inner,
+    & .#{$namespace}-textarea__inner {
+      &, &:focus {
+        border-color: $--color-danger;
+      }
+    }
+    & .#{$namespace}-input-group__append,
+    & .#{$namespace}-input-group__prepend {
+      & .#{$namespace}-input__inner {
+        border-color: transparent;
+      }
+    }
+    .#{$namespace}-input__validateIcon {
+      color: $--color-danger;
+    }
+  }
+
+  @include m(feedback) {
+    .#{$namespace}-input__validateIcon {
+      display: inline-block;
+    }
+  }
 }

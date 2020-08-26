@@ -1,69 +1,65 @@
 @charset "UTF-8";
 
 // Class
-$ui-input-prefix-cls: "#{$css-prefix}input"!default;
+$ui-input-cls: input !default;
+$ui-textarea-cls: textarea !default;
 
-// Color
-$ui-input-color: lighten($text-color, 0.31) !default;
-$ui-input-placeholder-color: lighten($text-color, 1.6) !default;
-$ui-input-slot-color: lighten($text-color, 1.6) !default;
-$ui-input-append-icon-color: lighten($text-color, 1.9) !default;
+// // Color
+// $ui-input-color: lighten($text-color, 0.31) !default;
+// $ui-input-placeholder-color: lighten($text-color, 1.6) !default;
+// $ui-input-slot-color: lighten($text-color, 1.6) !default;
+// $ui-input-append-icon-color: lighten($text-color, 1.9) !default;
 
-$ui-input-clickable-hover-color: lighten($ui-input-append-icon-color, 0.7) !default;
-$ui-input-clickable-hover-border-color: lighten($ui-input-append-icon-color, 0.7) !default;
+// $ui-input-clickable-hover-color: lighten($ui-input-append-icon-color, 0.7) !default;
+// $ui-input-clickable-hover-border-color: lighten($ui-input-append-icon-color, 0.7) !default;
 
-$ui-input-cursor-disabled: $cursor-disabled !default;
+// $ui-input-cursor-disabled: $cursor-disabled !default;
 
-// Background
-$ui-input-bg-color: #fff !default;
+// // Background
+// $ui-input-bg-color: #fff !default;
 
-// Font
-$font-size-small: $font-size-base - 2 !default;
-$ui-input-font-size-small: $font-size-small !default;
+// // Font
+// $font-size-small: $font-size-base - 2 !default;
+// $ui-input-font-size-small: $font-size-small !default;
 
-$ui-input-font-size-base: $font-size-base !default;
-$ui-input-font-size-large: $font-size-base + 2 !default;
-$ui-input-font-size-small: $font-size-base - 4 !default;
-$ui-input-font-size-mini: $font-size-base - 6 !default;
+// $ui-input-font-size-base: $font-size-base !default;
+// $ui-input-font-size-large: $font-size-base + 2 !default;
+// $ui-input-font-size-small: $font-size-base - 4 !default;
+// $ui-input-font-size-mini: $font-size-base - 6 !default;
 
-$ui-input-height-base: 32px!default;
-$ui-input-height-large: 36px!default;
-$ui-input-height-small: 24px!default;
+// $ui-input-height-base: 32px!default;
+// $ui-input-height-large: 36px!default;
+// $ui-input-height-small: 24px!default;
 
-// Border
-$ui-input-border: solid 1px $border-color-base !default;
-$ui-input-border-color: $border-color-base !default;
-$ui-input-active-border-color: lighten($border-color-base, 2) !default;
+// // Border
+// $ui-input-border: solid 1px $border-color-base !default;
+// $ui-input-border-color: $border-color-base !default;
+// $ui-input-active-border-color: lighten($border-color-base, 2) !default;
 
-$ui-input-hover-border-color: lighten($border-color-base, 0.62) !default;
-$ui-input-focus-border-color: $link-color-base !default;
+// $ui-input-hover-border-color: lighten($border-color-base, 0.62) !default;
+// $ui-input-focus-border-color: $link-color-base !default;
 
-$ui-input-border-radius: $border-radius-base !default;
-
-
-// Border
+// $ui-input-border-radius: $border-radius-base !default;
 
 
-// Disabled
-$ui-input-disabled-color: lighten($disabled-color, 0.5) !default;
-$ui-input-disabled-bg-color: $disabled-color !default;
-$ui-input-disabled-border-color: lighten($disabled-color, 0.86) !default;
-
-$ui-input-disabled-placeholder-color: lighten($disabled-color, 0.7) !default;
+// // Border
 
 
-// Textarea - Disabled
-$textarea-disabled-bg-color: $ui-input-disabled-bg-color !default;
-$textarea-disabled-border-color: $ui-input-disabled-border-color !default;
-$textarea-disabled-color: $ui-input-disabled-color !default;
+// // Disabled
+// $ui-input-disabled-color: lighten($disabled-color, 0.5) !default;
+// $ui-input-disabled-bg-color: $disabled-color !default;
+// $ui-input-disabled-border-color: lighten($disabled-color, 0.86) !default;
 
-$textarea-bg-color: #fff !default;
-$textarea-border-color: $border-color-base !default;
-$textarea-placeholder-color: lighten($text-color, 1.6) !default;
-$textarea-hover-border-color: lighten($border-color-base, 0.62) !default;
-$textarea-focus-border-color: $link-color-base !default;
+// $ui-input-disabled-placeholder-color: lighten($disabled-color, 0.7) !default;
 
 
+// // Textarea - Disabled
+// $textarea-disabled-bg-color: $ui-input-disabled-bg-color !default;
+// $textarea-disabled-border-color: $ui-input-disabled-border-color !default;
+// $textarea-disabled-color: $ui-input-disabled-color !default;
 
-
-
+// $textarea-bg-color: #fff !default;
+// $textarea-border-color: $border-color-base !default;
+// $textarea-placeholder-color: lighten($text-color, 1.6) !default;
+// $textarea-hover-border-color: lighten($border-color-base, 0.62) !default;
+// $textarea-focus-border-color: $link-color-base !default;

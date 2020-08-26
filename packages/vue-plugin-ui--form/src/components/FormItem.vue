@@ -1,24 +1,39 @@
 <template>
-  <div class="u-form-item" :class="{
-    'is-error': validateState === 'error' && !silent && !form$.customizeError && !customizeError,
-    'is-customize-error': validateState === 'error' && (form$.customizeError || customizeError),
-    'is-validating ivu-form-item-validating': validateState === 'validating',
-    'is-required': isRequired || required
-  }">
-    <label :for="prop" class="u-form-item__label" :class="labelClass || form$.labelClass" v-bind:style="labelStyle" v-if="label">
-      <slot name="label">{{label + form$.labelSuffix}}</slot>
-    </label>
-    <div class="u-form-item__content" :class="contentClass || form$.contentClass" v-bind:style="contentStyle">
+  <div class="u-form-item" :class="[{
+      'u-form-item--feedback': form$ && form$.statusIcon,
+      'is-error': validateState === 'error',
+      'is-validating': validateState === 'validating',
+      'is-success': validateState === 'success',
+      'is-required': isRequired || required,
+      'is-no-asterisk': form$ && form$.hideRequiredAsterisk
+    },
+    sizeClass ? 'u-form-item--' + sizeClass : ''
+  ]">
+    <label-wrap
+      :is-auto-width="labelStyle && labelStyle.width === 'auto'"
+      :update-all="form$.labelWidth === 'auto'">
+      <label :for="labelFor" class="u-form-item__label" :style="labelStyle" v-if="label || $slots.label">
+        <slot name="label">{{label + form$.labelSuffix}}</slot>
+      </label>
+    </label-wrap>
+    <div class="u-form-item__content" :style="contentStyle">
       <slot></slot>
       <transition name="el-zoom-in-top">
-        <div v-if="validateState === 'error' && showMessage && form$.showMessage">
+        <slot
+          v-if="validateState === 'error' && showMessage && form$.showMessage"
+          name="error"
+          :error="validateMessage">
           <div
-            class="u-form-item__error u-form-item__custom-error"
-            v-if="$slots.customError">
-            <slot :errorMessage="validateMessage" name="customError"></slot><br><br>
+            class="u-form-item__error"
+            :class="{
+              'u-form-item__error--inline': typeof inlineMessage === 'boolean'
+                ? inlineMessage
+                : (form$ && form$.inlineMessage || false)
+            }"
+          >
+            {{validateMessage}}
           </div>
-          <div class="u-form-item__error">{{validateMessage}}</div>
-        </div>
+        </slot>
       </transition>
     </div>
   </div>
