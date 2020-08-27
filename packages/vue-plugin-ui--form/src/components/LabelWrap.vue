@@ -15,26 +15,10 @@ export default defineComponent({
     updateAll: Boolean
   },
 
-  setup (props, context) {
-    const form: any = inject('#UForm')
-    const formItem: any = inject('#UFormItem')
-    const slots = context.slots
-    if (!slots) return null
-    if (props.isAutoWidth) {
-      const autoLabelWidth = form.autoLabelWidth
-      const style = {
-        marginLeft: '0'
-      }
-      if (autoLabelWidth && autoLabelWidth !== 'auto') {
-        const marginLeft = parseInt(autoLabelWidth, 10) /* - this.computedWidth */
-        if (marginLeft) {
-          style.marginLeft = marginLeft + 'px'
-        }
-      }
-    }
+  setup () {
     return {
-      form$: form,
-      formItem$: formItem
+      form$: inject('#UForm') as any,
+      formItem$: inject('#UFormItem') as any
     }
   },
 

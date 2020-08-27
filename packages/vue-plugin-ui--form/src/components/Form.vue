@@ -42,6 +42,10 @@ export default defineComponent({
     hideRequiredAsterisk: {
       type: Boolean,
       default: false
+    },
+    inlineMessage: {
+      type: Boolean,
+      default: undefined
     }
   },
 
@@ -67,14 +71,21 @@ export default defineComponent({
   },
   data () {
     return {
-      fields: []
+      fields: [],
+      potentialLabelWidthArr: []
     } as {
       fields: Array<typeof FormItem>;
+      potentialLabelWidthArr: number[];
     }
   },
   computed: {
     computedRules (): object {
       return Object.assign({}, componentsOptions.validator.rules, this.rules)
+    },
+    autoLabelWidth () {
+      if (!this.potentialLabelWidthArr.length) return 0
+      const max = Math.max(...this.potentialLabelWidthArr)
+      return max ? `${max}px` : ''
     }
   },
   methods: {
@@ -118,6 +129,26 @@ export default defineComponent({
       const field = this.fields.filter(field => field.prop === prop)[0]
       if (!field) { throw new Error('must call validateField with valid prop string!') }
       field.validate('', cb, Object.assign({ trigger: 'field' }, options))
+    },
+    getLabelWidthIndex (width: number) {
+      const index = this.potentialLabelWidthArr.indexOf(width)
+      // it's impossible
+      if (index === -1) {
+        throw new Error('[UForm]unpected width: ' + width)
+      }
+      return index
+    },
+    registerLabelWidth (val: number, oldVal: number) {
+      if (val && oldVal) {
+        const index = this.getLabelWidthIndex(oldVal)
+        this.potentialLabelWidthArr.splice(index, 1, val)
+      } else if (val) {
+        this.potentialLabelWidthArr.push(val)
+      }
+    },
+    deregisterLabelWidth (val: number) {
+      const index = this.getLabelWidthIndex(val)
+      this.potentialLabelWidthArr.splice(index, 1)
     }
   }
 })

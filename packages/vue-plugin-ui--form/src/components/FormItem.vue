@@ -18,7 +18,7 @@
     </LabelWrap>
     <div class="u-form-item__content" :style="contentStyle">
       <slot></slot>
-      <transition name="el-zoom-in-top">
+      <transition name="u-zoom-in-top">
         <slot
           v-if="validateState === 'error' && showMessage && form$.showMessage"
           name="error"
@@ -31,7 +31,7 @@
                 : (form$ && form$.inlineMessage || false)
             }"
           >
-            {{validateMessage}}
+            {{validateMessage}} +++
           </div>
         </slot>
       </transition>
@@ -115,7 +115,11 @@ export default defineComponent({
     contentClass: {
       type: String
     },
-    for: String
+    for: String,
+    inlineMessage: {
+      type: Boolean,
+      default: undefined
+    }
   },
 
   provide () {
@@ -137,10 +141,11 @@ export default defineComponent({
         addField: AddField;
         removeField: RemoveField;
         inline: boolean;
-        labelWidth: number;
+        labelWidth: string;
         model: any;
         computedRules: RuleItem[];
         validateField: ValidateField;
+        autoLabelWidth: string;
       }>('#UForm', {} as any),
       ...i18n({
         messages: messages || defaultMessages
@@ -200,10 +205,18 @@ export default defineComponent({
       return ret
     },
     contentStyle () {
-      const ret: { marginLeft?: string | number } = {}
+      const ret: { marginLeft?: string } = {}
+      const label = this.label
       if (this.form$.labelPosition === 'top' || this.form$.inline) return ret
+      if (!label && !this.labelWidth && this.isNested) return ret
       const labelWidth = this.labelWidth || this.form$.labelWidth
-      if (labelWidth) {
+      if (labelWidth === 'auto') {
+        if (this.labelWidth === 'auto') {
+          ret.marginLeft = this.computedLabelWidth
+        } else if (this.form$.labelWidth === 'auto') {
+          ret.marginLeft = this.form$.autoLabelWidth
+        }
+      } else {
         ret.marginLeft = labelWidth
       }
       return ret
@@ -236,7 +249,9 @@ export default defineComponent({
       validator: {},
       isRequired: false,
       validateError: {},
-      silent: false
+      silent: false,
+      computedLabelWidth: '',
+      isNested: false
     } as {
       mergedRules: RuleItemEx[];
       validateState: string;
@@ -245,6 +260,8 @@ export default defineComponent({
       isRequired: boolean;
       validateError: ValidateError;
       silent: boolean | undefined;
+      computedLabelWidth: string;
+      isNested: boolean;
     }
   },
   methods: {
@@ -323,6 +340,9 @@ export default defineComponent({
         return
       }
       this.validate(trigger)
+    },
+    updateComputedLabelWidth (width: number) {
+      this.computedLabelWidth = width ? `${width}px` : ''
     }
   },
   mounted () {
