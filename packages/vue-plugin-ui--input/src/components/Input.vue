@@ -172,17 +172,6 @@ export default defineComponent({
     tabindex: String
   },
 
-  inject: {
-    elFormItem: {
-      from: 'elFormItem',
-      default: undefined
-    },
-    elForm: {
-      from: 'elForm',
-      default: undefined
-    }
-  },
-
   setup () {
     // this.$on('inputSelect', this.select)
     return {
@@ -190,9 +179,7 @@ export default defineComponent({
         statusIcon: false
       }),
       formItem$: inject('#UFormItem', {
-        validateState: '',
-        onFieldBlur: {} as (val: string | number) => void,
-        onFieldChange: {} as (val: string | number) => void
+        validateState: ''
       }),
       $ELEMENT: { size: 0 }
     }

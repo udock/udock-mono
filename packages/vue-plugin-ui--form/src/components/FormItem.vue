@@ -130,23 +130,19 @@ export default defineComponent({
 
   setup () {
     const { i18n, messages } = inject('i18n', i18nFallback)
-    type ResolveItem = (error: any) => void
-    type AddField = (field: any) => void
-    type RemoveField = (field: any) => void
-    type ValidateField = (prop: string, cb?: Function, options?: object) => void
     return {
-      form$: inject<{
-        resolveItem: ResolveItem;
+      form$: inject('#UForm') as {
+        resolveItem: (error: any) => void;
         labelPosition: string;
-        addField: AddField;
-        removeField: RemoveField;
+        addField: (field: any) => void;
+        removeField: (field: any) => void;
         inline: boolean;
         labelWidth: string;
         model: any;
         computedRules: RuleItem[];
-        validateField: ValidateField;
+        validateField: (prop: string, cb?: Function, options?: object) => void;
         autoLabelWidth: string;
-      }>('#UForm', {} as any),
+      },
       ...i18n({
         messages: messages || defaultMessages
       }),

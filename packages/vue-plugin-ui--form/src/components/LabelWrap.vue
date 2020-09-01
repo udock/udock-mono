@@ -17,8 +17,14 @@ export default defineComponent({
 
   setup () {
     return {
-      form$: inject('#UForm') as any,
-      formItem$: inject('#UFormItem') as any
+      form$: inject('#UForm') as {
+        autoLabelWidth: string;
+        registerLabelWidth: (val: string, oldVal: string) => void;
+        deregisterLabelWidth: (val: string) => void;
+      },
+      formItem$: inject('#UFormItem') as {
+        updateComputedLabelWidth: (val: string) => void;
+      }
     }
   },
 
