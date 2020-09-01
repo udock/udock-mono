@@ -2,7 +2,7 @@
   "name": "@udock/vue-plugin-auto-router",
   "version": "2.0.5",
   "description": "@udock/vue-plugin-auto-router",
-  "main": "index.js",
+  "main": "dist/index.js",
   "directories": {
     "lib": "lib",
     "template": "template"
