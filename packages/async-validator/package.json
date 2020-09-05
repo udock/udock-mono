@@ -1,0 +1,41 @@
+{
+  "name": "@udock/async-validator",
+  "version": "3.4.0",
+  "main": "dist/index.js",
+  "description": "validate form asynchronous. fork https://github.com/yiminghe/async-validator",
+  "keywords": [
+    "validator",
+    "validate",
+    "async"
+  ],
+  "homepage": "https://github.com/udock/udock-mono/packages/async-validator",
+  "author": "vaniship@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:vaniship/udock/udock-mono.git"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/*"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/udock/udock-mono/issues"
+  },
+  "license": "MIT",
+  "config": {
+    "port": 8010
+  },
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "coverage:gha": "jest --coverage"
+  },
+  "devDependencies": {
+    "babel-jest": "^24.8.0",
+    "coveralls": "^2.13.1",
+    "jest": "^24.8.0"
+  }
+}

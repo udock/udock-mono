@@ -1,0 +1,21 @@
+{
+  "name": "@udock/vue-plugin-i18n",
+  "version": "2.0.0",
+  "author": {
+    "name": "vaniship@gmail.com"
+  },
+  "description": "@udock/vue-plugin-i18n",
+  "directories": {
+    "lib": "lib",
+    "template": "template"
+  },
+  "main": "dist/index.js",
+  "peerDependencies": {
+    "lodash": "^4.17.19",
+    "vue": "^2.6.11"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "license": "MIT"
+}

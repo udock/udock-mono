@@ -1,0 +1,10 @@
+{
+  "name": "@udock/vue-plugin-ui--animation",
+  "description": "@udock/vue-plugin-ui--animation",
+  "version": "2.0.0",
+  "files": [
+    "src"
+  ],
+  "main": "src/index.ts",
+  "license": "MIT"
+}

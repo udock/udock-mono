@@ -1,0 +1,61 @@
+// 工具函数
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+
+@mixin square($size) {
+  @include size($size, $size);
+}
+
+// fix chrome 12px bug, support ie
+@mixin iconfont-size-under-12px($size, $rotate: 0deg) {
+  display: inline-block;
+  $font-scale: unit($size / $font-size-base);
+  font-size: $font-size-base;
+  font-size: "#{$size} \9"; // ie8-9
+  transform: scale($font-scale) rotate($rotate);
+  :root & {
+    font-size: $font-size-base; // reset ie9 and above
+  }
+}
+
+@mixin utils-user-select($value) {
+  -moz-user-select: $value;
+  -webkit-user-select: $value;
+  -ms-user-select: $value;
+}
+
+@mixin utils-clearfix {
+  $selector: &;
+
+  @at-root {
+    #{$selector}::before,
+    #{$selector}::after {
+      display: table;
+      content: "";
+    }
+    #{$selector}::after {
+      clear: both
+    }
+  }
+}
+
+@mixin utils-vertical-center {
+  $selector: &;
+
+  @at-root {
+    #{$selector}::after {
+      display: inline-block;
+      content: "";
+      height: 100%;
+      vertical-align: middle
+    }
+  }
+}
+
+@mixin utils-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

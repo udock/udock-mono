@@ -24,7 +24,7 @@
   },
   "peerDependencies": {
     "lodash": "^4.17.19",
-    "vue": "^3.0.0-rc.5",
+    "vue": "^2.6.11",
     "vue-router": "^3.4.3"
   }
 }

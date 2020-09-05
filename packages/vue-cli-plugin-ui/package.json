@@ -1,0 +1,19 @@
+{
+  "name": "@udock/vue-cli-plugin-ui",
+  "version": "2.0.0",
+  "description": "@udock/vue-cli-plugin-ui",
+  "author": {
+    "name": "vaniship@gmail.com"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "dependencies": {
+    "@udock/vue-plugin-ui": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@udock/vue-plugin-i18n": "^2.0.0"
+  },
+  "main": "dist/index.js",
+  "license": "MIT"
+}

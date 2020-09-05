@@ -1,0 +1,22 @@
+@charset "UTF-8";
+@import './settings';
+@import './icon-list';
+
+@font-face {
+  font-family: $ui-icon-font-family;
+  src:url(#{$ui-icon-font-path}.eot?v=#{$ui-icon-font-version});
+  src:url(#{$ui-icon-font-path}.eot?v=#{$ui-icon-font-version}#iefix) format("embedded-opentype"),
+    url(#{$ui-icon-font-path}.ttf?v=#{$ui-icon-font-version}) format("truetype"),
+    url(#{$ui-icon-font-path}.woff?v=#{$ui-icon-font-version}) format("woff"),
+    url(#{$ui-icon-font-path}.svg?v=#{$ui-icon-font-version}) format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.#{$ui-icon-cls} {
+  @include font-icon-base($ui-icon-font-family);
+}
+
+@each $key, $value in $ui-icon-list {
+  .#{$ui-icon-cls}-#{$key}:before { content: #{'"\\' + $value + '"'} }
+}

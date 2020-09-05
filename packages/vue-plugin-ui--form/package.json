@@ -1,0 +1,23 @@
+{
+  "name": "@udock/vue-plugin-ui--form",
+  "version": "2.0.0",
+  "author": {
+    "name": "vaniship@gmail.com"
+  },
+  "description": "@udock/vue-plugin-ui--form",
+  "directories": {
+    "lib": "lib",
+    "template": "template"
+  },
+  "main": "src/index.ts",
+  "dependencies": {
+    "@udock/async-validator": "^3.4.0"
+  },
+  "peerDependencies": {
+    "vue": "^2.6.11"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "license": "MIT"
+}

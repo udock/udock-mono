@@ -1,0 +1,6 @@
+$ui-icon-font-family: #{$namespace}-icons !default;
+$ui-icon-font-path: "~@udock/vue-plugin-ui--icon/src/fonts/#{$namespace}-icons"!default;
+$ui-icon-font-version: "1.0.0" !default;
+$ui-icon-is-extend: true !default;
+
+$ui-icon-cls : #{$namespace}-icon !default;

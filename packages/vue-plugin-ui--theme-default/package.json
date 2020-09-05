@@ -1,0 +1,12 @@
+{
+  "name": "@udock/vue-plugin-ui--theme-default",
+  "description": "@udock/vue-plugin-ui--theme-default",
+  "version": "2.0.0",
+  "files": [
+    "src"
+  ],
+  "main": "src/scss/index.scss",
+  "scripts": {
+  },
+  "license": "MIT"
+}
