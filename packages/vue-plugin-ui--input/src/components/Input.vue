@@ -147,7 +147,7 @@ export default defineComponent({
     /** @Deprecated in next major version */
     autoComplete: {
       type: String,
-      validator (val) {
+      validator (/* val: string */) {
         process.env.NODE_ENV !== 'production' &&
           console.warn('[Element Warn][Input]\'auto-complete\' property will be deprecated in next major version. please use \'autocomplete\' instead.')
         return true
@@ -182,7 +182,9 @@ export default defineComponent({
         statusIcon: false
       }),
       formItem$: inject('#UFormItem', {
-        validateState: ''
+        validateState: '',
+        disabled: false,
+        formItemSize: 0
       }),
       $ELEMENT: { size: 0 }
     }
@@ -196,7 +198,7 @@ export default defineComponent({
       isComposing: false,
       passwordVisible: false
     } as {
-      textareaCalcStyle: any;
+      textareaCalcStyle: object;
       hovering: boolean;
       focused: boolean;
       isComposing: boolean;
@@ -210,7 +212,7 @@ export default defineComponent({
       return this.value || this.modelValue || ''
     },
     _elFormItemSize (): number {
-      return (this.formItem$ || {}).formItemSize
+      return this.formItem$.formItemSize
     },
     validateState (): string {
       return this.formItem$ ? this.formItem$.validateState : ''
@@ -341,10 +343,12 @@ export default defineComponent({
         }
         return
       }
-      const minRows = autosize.minRows
-      const maxRows = autosize.maxRows
 
-      this.textareaCalcStyle = calcTextareaHeight(this.$refs.textarea as HTMLTextAreaElement, minRows, maxRows)
+      if (autosize !== true) {
+        const minRows = autosize.minRows
+        const maxRows = autosize.maxRows
+        this.textareaCalcStyle = calcTextareaHeight(this.$refs.textarea as HTMLTextAreaElement, minRows, maxRows)
+      }
     },
     setNativeInputValue () {
       // const input = this.getInput()
@@ -359,38 +363,40 @@ export default defineComponent({
     handleCompositionStart () {
       this.isComposing = true
     },
-    handleCompositionUpdate (event: any) {
+    handleCompositionUpdate (/* event: KeyboardEvent */) {
       // const text = event.target.value
       // const lastCharacter = text[text.length - 1] || ''
       this.isComposing = true // !isKorean(lastCharacter)
     },
-    handleCompositionEnd (event: any) {
+    handleCompositionEnd (event: KeyboardEvent) {
       if (this.isComposing) {
         this.isComposing = false
         this.handleInput(event)
       }
     },
-    handleInput (event: any) {
+    handleInput (event: KeyboardEvent) {
       // should not emit input during composition
       // see: https://github.com/ElemeFE/element/issues/10516
       if (this.isComposing) return
       // hack for https://github.com/ElemeFE/element/issues/8548
       // should remove the following line when we don't support IE
-      if (event.target.value === this.nativeInputValue) return
-      this.$emit('input', event.target.value)
-      this.$emit('update:modelValue', event.target.value)
+      const target = event.target as HTMLInputElement
+      if (target.value === this.nativeInputValue) return
+      this.$emit('input', target.value)
+      this.$emit('update:modelValue', target.value)
       // ensure native input value is controlled
       // see: https://github.com/ElemeFE/element/issues/12850
       this.$nextTick(this.setNativeInputValue)
     },
-    handleChange (event: any) {
-      this.$emit('change', event.target.value)
-      this.$emit('update:modelValue', event.target.value)
+    handleChange (event: InputEvent) {
+      const target = event.target as HTMLInputElement
+      this.$emit('change', target.value)
+      this.$emit('update:modelValue', target.value)
     },
-    calcIconOffset (place: any) {
-      const elList = ([] as any).slice.call(this.$el.querySelectorAll(`.u-input__${place}`) || [])
+    calcIconOffset (place: string) {
+      const elList: HTMLElement[] = [].slice.call(this.$el.querySelectorAll(`.u-input__${place}`) || [])
       if (!elList.length) return
-      let el = null
+      let el: HTMLElement | null = null
       for (let i = 0; i < elList.length; i++) {
         if (elList[i].parentNode === this.$el) {
           el = elList[i]
@@ -404,7 +410,7 @@ export default defineComponent({
       }
       const pendant = pendantMap[place as keyof typeof pendantMap]
       if (this.$slots[pendant] || this.$scopedSlots[pendant]) {
-        el.style.transform = `translateX(${place === 'suffix' ? '-' : ''}${this.$el.querySelector(`.u-input-group__${pendant}`).offsetWidth}px)`
+        el.style.transform = `translateX(${place === 'suffix' ? '-' : ''}${(this.$el.querySelector(`.u-input-group__${pendant}`) as HTMLElement).offsetWidth}px)`
       } else {
         el.removeAttribute('style')
       }
