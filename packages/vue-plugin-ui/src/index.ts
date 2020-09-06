@@ -1,6 +1,6 @@
-import Vue from 'vue'
+import { Vue as _Vue } from 'vue/types/vue'
 
-export default (Vue: Vue, options: any ) => {
+export default (Vue: typeof _Vue, options: any) => {
 
 }
 
@@ -23,7 +23,7 @@ export type FormItem = {
   onValidate: (trigger: string) => void;
 }
 
-type Adapter = (form: Form, fromItem: FormItem) => void | { [key: string]: Function }
+export type Adapter = (form: Form, fromItem: FormItem) => void | { [key: string]: Function }
 
 export function useForm ({ adapter }: { adapter?: Adapter } = {}): {
   form: Form,

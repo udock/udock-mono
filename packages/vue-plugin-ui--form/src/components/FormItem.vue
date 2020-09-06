@@ -48,7 +48,6 @@ import isObject from 'lodash/isObject'
 import isFunction from 'lodash/isFunction'
 import noop from 'lodash/noop'
 import componentsOptions from '../config/components-options'
-// eslint-disable-next-line no-unused-vars
 import AsyncValidator, { RuleItem, ValidateError } from '@udock/async-validator'
 import get from 'lodash/get'
 import LabelWrap from './LabelWrap.vue'

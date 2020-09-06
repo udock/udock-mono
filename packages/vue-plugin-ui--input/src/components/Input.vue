@@ -111,7 +111,6 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line no-unused-vars
 import { defineComponent, inject, PropType } from '@vue/composition-api'
 // import defaultMessages from '../i18n/langs'
 import calcTextareaHeight from '../lib/calcTextareaHeight'

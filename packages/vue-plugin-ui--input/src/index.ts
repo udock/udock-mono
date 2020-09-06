@@ -7,7 +7,6 @@ import Input from './components/Input.vue'
 export default function (Vue: typeof _Vue, options: any) {
   Vue.component(options.name || 'UInput', defineComponent({
     setup (props, context) {
-      console.log('tag', context.slots)
       const { eventHandlers } = useForm({
         adapter (form, formItem) {
           provide('elForm', form)

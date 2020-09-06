@@ -14,6 +14,7 @@
     "@udock/async-validator": "^3.4.0"
   },
   "peerDependencies": {
+    "@types/lodash": "^4.14.159",
     "vue": "^2.6.11"
   },
   "scripts": {
