@@ -1,0 +1,25 @@
+{
+  "name": "@udock/plugin-mock",
+  "version": "2.0.1",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "mockjs": "^1.0.1-beta3",
+    "qs": "^6.9.4",
+    "xml-js": "^1.6.11"
+  },
+  "peerDependencies": {
+    "axios": "^0.20.0",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/js-url": "^1.8.29",
+    "@types/mockjs": "^1.0.3",
+    "@types/qs": "^6.9.4"
+  },
+  "license": "MIT"
+}
