@@ -51,7 +51,7 @@ type MockResponseConf = {
 
 type MockConfItem = {
   request: MockRequestConf | false | undefined;
-  response: MockResponseConf;
+  response: MockResponseConf | false | undefined;
 } | false
 
 type MockConf = MockConfItem[]
@@ -168,7 +168,7 @@ function matching (confs: MockConf | false, req: AxiosRequestConfig): MockConfIt
   if (confs == false) throw {}
   for (let i=0, n=confs.length; i<n; i++) {
     const conf = confs[i]
-    if (conf === false || (!conf.request && !conf.response)) continue
+    if (conf === false || Object.keys(conf).length === 0) continue
     const ret = valid(conf.request, req)
     if (ret) {
       return ret === true ? conf : undefined
