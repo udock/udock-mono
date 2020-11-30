@@ -8,7 +8,7 @@ import merge from 'lodash/merge'
 import has from 'lodash/has'
 import pickBy from 'lodash/pickBy'
 import path from 'path'
-import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosResponse } from 'axios'
+import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosResponse, AxiosInterceptorManager } from 'axios'
 import Mock, { MockjsValidRsItem } from 'mockjs'
 import convert from 'xml-js'
 import qs from 'qs'
@@ -223,6 +223,17 @@ const mockErr = new Error()
 const useProxy = new Error()
 const originalAxios = axios.create()
 
+function hackInterceptorsRequestUse (request: AxiosInterceptorManager<AxiosRequestConfig>, requestInterceptor: (request: AxiosRequestConfig) => AxiosRequestConfig) {
+  let requestInterceptorId = request.use(requestInterceptor)
+  const _use = request.use
+  request.use = (...args) => {
+    request.eject(requestInterceptorId)
+    const id = _use.apply(request, args)
+    requestInterceptorId = _use.call(request, requestInterceptor)
+    return id
+  }
+}
+
 export default {
   useProxy,
   init (options: MockOptions) {
@@ -350,13 +361,13 @@ export default {
         }
       }
 
-      axios.interceptors.request.use(requestInterceptor)
+      hackInterceptorsRequestUse(axios.interceptors.request, requestInterceptor)
       axios.interceptors.response.use(undefined, responseInterceptor)
 
       const _create = axios.create
       axios.create = (...args) => {
         const instance = _create(...args)
-        instance.interceptors.request.use(requestInterceptor)
+        hackInterceptorsRequestUse(instance.interceptors.request, requestInterceptor)
         instance.interceptors.response.use(undefined, responseInterceptor)
         return instance
       }
