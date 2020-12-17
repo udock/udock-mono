@@ -345,7 +345,10 @@ export default {
             if (timeout > timeCost) {
               setTimeout(() => {
                 if (error.response.status >= 200 && error.response.status < 300) {
-                  resolve(error.response)
+                  resolve({
+                    ...error.response,
+                    config: error.request
+                  })
                 } else {
                   reject(error.response)
                 }
