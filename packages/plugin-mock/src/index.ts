@@ -1,5 +1,4 @@
 import extend from 'lodash/extend'
-import isObject from 'lodash/isObject'
 import isFunction from 'lodash/isFunction'
 import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
@@ -8,11 +7,103 @@ import merge from 'lodash/merge'
 import has from 'lodash/has'
 import pickBy from 'lodash/pickBy'
 import path from 'path'
-import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosResponse, AxiosInterceptorManager } from 'axios'
+import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosInterceptorManager } from 'axios'
 import Mock, { MockjsValidRsItem } from 'mockjs'
 import convert from 'xml-js'
 import qs from 'qs'
 import './mockjs.patch'
+
+type Headers = { [key: string]: string }
+
+function isQueryObject (obj: any): obj is { [key: string]: any } {
+  return obj && typeof obj === 'object'
+}
+
+export type MockResult<T> = {
+  status: number,
+  headers?: Headers,
+  data: T
+}
+
+export async function duration (time: number) {
+  await new Promise(resolve => {
+    setTimeout(resolve, time)
+  })
+}
+
+export function success<T> (data: T, result?: MockResult<T>) {
+  return {
+    status: 200,
+    data,
+    ...result
+  }
+}
+
+export function error<T> (data: T, result?: MockResult<T>) {
+  return {
+    status: 500,
+    data,
+    ...result
+  }
+}
+
+export function tunneling () {
+  return {
+    status: -1,
+    data: useTunneling
+  }
+}
+
+type Context<Params> = {
+  context: {
+    root: {
+      request: {
+        data: Params;
+      };
+    };
+  };
+}
+
+type MockRequestConf<Params> = {
+  enable?: boolean;
+  method?: Method | RegExp;
+  headers?: {
+    [key: string]: string
+  };
+  query?: Params;
+  data?: Params;
+  body?: any;
+  _valid?: (type: string, template: any, data: any, looseValid?: Function) => MockjsValidRsItem[];
+  _format?: string | Function
+}
+
+type MockResponseConf<Params, Result> = {
+  status: number;
+  data: Result | ((ctx: Context<Params>) => Result);
+  duration?: number;
+  headers?: Headers;
+  _format?: string | Function;
+  proxyPass?: string;
+}
+
+export type MockFunction<Result = unknown> = (request: AxiosRequestConfig, ctx: {
+  tunneling: (request?: AxiosRequestConfig) => MockResult<symbol>;
+  duration: (time: number) => Promise<void>;
+  success: <T=unknown> (data: T) => MockResult<T>;
+  error: <T=unknown> (data: T) => MockResult<T>;
+}) => Promise<MockResult<Result>>
+
+type MockConfItem<Params, Result> = {
+  enable?: boolean;
+  tunneling?: boolean;
+  request?: MockRequestConf<Params> | false;
+  response?: MockResponseConf<Params, Result> | false;
+} | false
+
+export type MockConfig<Params = unknown, Result = unknown> = false
+  | MockConfItem<Params, Result>[]
+  | MockFunction<Result>
+  | MockResult<Result>
 
 export type MockOptions = {
   load?: (path: string) => any;
@@ -20,48 +111,12 @@ export type MockOptions = {
   axios?: AxiosStatic;
 }
 
-type MockRequestConf = {
-  method: Method;
-  headers?: {
-    [key: string]: string
-  };
-  query?: {
-    [key: string]: string
-  };
-  data?: any;
-  body?: any;
-  _valid?: (type: string, template: any, data: any, looseValid?: Function) => MockjsValidRsItem[];
-  _format?: string | Function
-}
-
-type Context = {
-
-}
-
-type MockResponseConf = {
-  time_cost: number;
-  status: number;
-  headers?: {
-    [key: string]: string
-  };
-  data?: object | ((context: Context) => object);
-  _format?: string | Function;
-  proxy_pass?: string;
-}
-
-type MockConfItem = {
-  request: MockRequestConf | false | undefined;
-  response: MockResponseConf | false | undefined;
-} | false
-
-type MockConf = MockConfItem[]
-
 type MockError = {
-  url: string | Error;
+  url: string | symbol;
   useProxy: Error;
   request: AxiosRequestConfig;
   originalRequest: AxiosRequestConfig;
-  response: MockResponseConf;
+  response: MockResponseConf<unknown, unknown>;
 }
 
 function looseValid (rule: ((data: object) => MockjsValidRsItem[]) | object, data: object): MockjsValidRsItem[] {
@@ -75,12 +130,12 @@ function looseValid (rule: ((data: object) => MockjsValidRsItem[]) | object, dat
   }
 }
 
-function valid (rule: MockRequestConf | false | undefined, data: AxiosRequestConfig): boolean {
-  if (!rule) {
+function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosRequestConfig): boolean {
+  if (!rule || rule.enable === false) {
     return true
   } else {
     // 匹配 method
-    if (!(data.method || 'get').match(typeof rule.method === 'string'
+    if (rule.method && !(data.method || 'get').match(typeof rule.method === 'string'
       ? rule.method.toLowerCase()
       : rule.method)
     ) {
@@ -107,7 +162,7 @@ function valid (rule: MockRequestConf | false | undefined, data: AxiosRequestCon
     }
 
     // 匹配 query
-    if (rule.query) {
+    if (isQueryObject(rule.query)) {
       for (const key in rule.query) {
         rule.query[key] += '' // 转成字符串
       }
@@ -164,29 +219,42 @@ function getQuery (request: AxiosRequestConfig) {
   )
 }
 
-function matching (confs: MockConf | false, req: AxiosRequestConfig): MockConfItem | undefined {
+function matching (
+  confs: MockConfig<unknown, unknown> | false,
+  req: AxiosRequestConfig,
+  defaultConf: MockConfItem<unknown, unknown>
+) {
   if (confs == false) throw {}
-  for (let i=0, n=confs.length; i<n; i++) {
-    const conf = confs[i]
-    if (conf === false || Object.keys(conf).length === 0) continue
-    const ret = valid(conf.request, req)
-    if (ret) {
-      return ret === true ? conf : undefined
+  if (Array.isArray(confs)) {
+    for (let i=0, n=confs.length; i<n; i++) {
+      const conf = confs[i]
+      if (conf === false || Object.keys(conf).length === 0 || conf.enable === false) continue
+      const mergedConf = merge({}, defaultConf, conf)
+      if (defaultConf && defaultConf.tunneling !== undefined) {
+        mergedConf.tunneling = defaultConf.tunneling // 高优使用全局配置
+      }
+      const ret = valid(mergedConf.request, req)
+      if (ret) {
+        return ret === true ? mergedConf : undefined
+      }
+    }
+  } else if (typeof confs === 'function') {
+    return confs
+  } else if (typeof confs === 'object') {
+    return () => {
+      return confs
     }
   }
 }
 
 function mockWithContext (template: any, context: any) {
-  // return Mock.mock(
-  //   defaults(
-  //     {response: template},
-  //     mapValues(context, (val) => () => val)
-  //   )
-  // ).response
   template = merge({}, template)
   const _format = template._format
   delete template._format
   try {
+    if (Object.keys(template).length === 0) {
+      throw new Error('no respone temmplate!')
+    }
     template = mapValues(template, val => {
       return isFunction(val) ? val({ context: {root: context} }) : val
     })
@@ -210,20 +278,42 @@ function mockWithContext (template: any, context: any) {
     }
     return response
   } catch (e) {
-    return { time_cost: 200,
-      status: 500,
-      data: JSON.stringify({
-        error: `respone temmplate error: ${e.message}`
-      })
+    return error(JSON.stringify({
+      error: `respone temmplate error: ${e.message}`
+    }))
+  }
+}
+
+async function handleMockFunction (originalRequest: AxiosRequestConfig, mockConf: Function) {
+  try {
+    const response = await mockConf(originalRequest, {
+      duration,
+      success,
+      error,
+      tunneling
+    })
+    if (response.data === useTunneling) {
+      return
+    } else {
+      console.log(`>>>> mock req: ${originalRequest.url}`, originalRequest)
+      return {
+        response: { ...response, duration: 0 },
+        logged: true
+      }
+    }
+  } catch (e) {
+    return {
+      response: error(e.message)
     }
   }
 }
 
-const mockErr = new Error()
+const useTunneling = Symbol('useTunneling')
+const useMockData = Symbol('useMockData')
 const useProxy = new Error()
 const originalAxios = axios.create()
 
-function hackInterceptorsRequestUse (request: AxiosInterceptorManager<AxiosRequestConfig>, requestInterceptor: (request: AxiosRequestConfig) => AxiosRequestConfig) {
+function hackInterceptorsRequestUse (request: AxiosInterceptorManager<AxiosRequestConfig>, requestInterceptor: (request: AxiosRequestConfig) => Promise<AxiosRequestConfig>) {
   let requestInterceptorId = request.use(requestInterceptor)
   const _use = request.use
   request.use = (...args) => {
@@ -239,20 +329,20 @@ export default {
   init (options: MockOptions) {
     const config = defaults(options.load!('config'), {
       global: {},
-      local_server: {},
-      third_party: {},
+      localServer: {},
+      thirdParty: {},
       bridge: {}
     })
 
     function mock (axios: AxiosStatic) {
-      const requestInterceptor = (request: AxiosRequestConfig) => {
+      const requestInterceptor = async (request: AxiosRequestConfig) => {
         let hostname
         let url
         let mockData
         let originalRequest = request
-        let defaultConf
+        let defaultConf: MockConfItem<unknown, unknown> | undefined
         request = defaults({query: getQuery(request)}, request)
-        if (config.global.enabled !== false) {
+        if (config.global.enable !== false) { // 全局总开关
           url = request.url!
           let pathname
           let port
@@ -272,29 +362,37 @@ export default {
               hostname += `:${port}`
             }
 
-            if (config.third_party.enabled === false) {
+            if (config.thirdParty.enable === false) {
               hostname = undefined
             } else {
               hostname = `third-party/${hostname}`
-              defaultConf = config.third_party
+              defaultConf = config.thirdParty
             }
           } else {
-            if (config.local_server.enabled === false) {
+            if (config.localServer.enable === false) {
               hostname = undefined
             } else {
               hostname = 'local-server'
-              defaultConf = config.local_server
+              defaultConf = config.localServer
             }
           }
+          defaultConf = merge({}, config.global, defaultConf)
         }
 
-        if (hostname) {
+        if (defaultConf && defaultConf.enable !== false &&  hostname) {
           try {
             // 尝试根据请求路径精确匹配,并获取对应的模拟数据配置文件
-            const mockConf = matching(options.load!(hostname + url), request)
-            if (isObject(mockConf) && mockConf.response) {
-              // 匹配成功，并定义了 response, 进行数据模拟
-              mockData = {response: mockWithContext(mockConf.response, {request})}
+            const mockConf = matching(options.load!(hostname + url), request, defaultConf)
+            if (typeof mockConf === 'function') {
+              mockData = await handleMockFunction(originalRequest, mockConf)
+              if (!mockData) {
+                return originalRequest
+              }
+            } else {
+              if (mockConf && !mockConf.tunneling) {
+                // 匹配成功，并且不使用透传, 进行数据模拟
+                mockData = {response: mockWithContext(mockConf.response, {request})}
+              }
             }
           } catch (e) {
             // 尝试根据请求路径精确匹配,并获取对应的模拟数据配置文件失败
@@ -302,11 +400,20 @@ export default {
             let def = path.relative('.', path.resolve(`${hostname}${url}`, '..', '_'))
             while (!mockData) {
               try {
-                const mockConf = matching(options.load!(def), request)
-                if (isObject(mockConf)) {
-                  if (!mockConf.response) { break }
-                  // 匹配成功，并定义了 response, 跳出循环，进行数据模拟
-                  mockData = {response: mockWithContext(mockConf.response, {request})}
+                const mockConf = matching(options.load!(def), request, defaultConf)
+                if (mockConf) {
+                  if (typeof mockConf === 'function') {
+                    mockData = await handleMockFunction(originalRequest, mockConf)
+                    if (!mockData) {
+                      return originalRequest
+                    }
+                  } else {
+                    // 匹配成功，跳出循环
+                    if (!mockConf.tunneling) {
+                      // 进行数据模拟
+                      mockData = {response: mockWithContext(mockConf.response, {request})}
+                    }
+                  }
                   break
                 }
               } catch (e) {}
@@ -319,18 +426,18 @@ export default {
           mockData = mockData || {useProxy}
         }
         if (mockData) {
-          console.log(`mock: ${request.url}`)
-          throw merge({url: mockErr, request, originalRequest}, config.global, defaultConf, mockData)
+          if (!mockData.logged) console.log(`>>>> mock req: ${originalRequest.url}`, originalRequest)
+          throw merge({url: useMockData, request, originalRequest}, defaultConf, mockData)
         } else {
           return originalRequest
         }
       }
 
       const responseInterceptor = (error: MockError) => {
-        if (error.url === mockErr) {
+        if (error.url === useMockData) {
           const originalRequest = error.originalRequest
-          if (error.response.proxy_pass && originalRequest.url?.startsWith('/')) {
-            originalRequest.url = error.response.proxy_pass.replace(/\/$/, '') + originalRequest.url
+          if (error.response.proxyPass && originalRequest.url?.startsWith('/')) {
+            originalRequest.url = error.response.proxyPass.replace(/\/$/, '') + originalRequest.url
             return originalAxios.request(originalRequest).catch(err => {
               return err.response
             })
@@ -341,18 +448,23 @@ export default {
           // return Promise.resolve(error)
           return new Promise((resolve, reject) => {
             const timeout = error.request.timeout || axios.defaults.timeout || 240000
-            const timeCost = error.response.time_cost || 0
-            if (timeout > timeCost) {
+            const duration = error.response.duration || 0
+            if (timeout > duration) {
               setTimeout(() => {
-                if (error.response.status >= 200 && error.response.status < 300) {
-                  resolve({
-                    ...error.response,
-                    config: error.request
-                  })
-                } else {
-                  reject(error.response)
+                const response = {
+                  ...error.response,
+                  config: error.request,
+                  __IS_MOCK_DATA__: true
                 }
-              }, timeCost)
+                delete response.duration
+                if (error.response.status >= 200 && error.response.status < 400) {
+                  console.log(`>>>> mock res(${response.status}, ${response.config.url}):`, response)
+                  resolve(response)
+                } else {
+                  console.log(`>>>> mock res(${response.status}, ${response.config.url}):`, response)
+                  reject(response)
+                }
+              }, duration)
             } else {
               setTimeout(() => {
                 reject(new Error(`timeout of ${timeout}ms exceeded`))

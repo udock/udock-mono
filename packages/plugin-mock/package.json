@@ -1,6 +1,6 @@
 {
   "name": "@udock/plugin-mock",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "main": "dist/index.js",
   "files": [
     "dist"
