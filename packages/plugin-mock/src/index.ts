@@ -1,58 +1,22 @@
-import extend from 'lodash/extend'
-import isFunction from 'lodash/isFunction'
-import isUndefined from 'lodash/isUndefined'
-import mapValues from 'lodash/mapValues'
-import defaults from 'lodash/defaults'
-import merge from 'lodash/merge'
-import has from 'lodash/has'
-import pickBy from 'lodash/pickBy'
+import './mockjs.patch'
+import {
+  isFunction,
+  isUndefined ,
+  mapValues,
+  defaults,
+  merge,
+  has,
+  pickBy
+} from 'lodash'
 import path from 'path'
 import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosInterceptorManager } from 'axios'
 import Mock, { MockjsValidRsItem } from 'mockjs'
 import convert from 'xml-js'
-import qs from 'qs'
-import './mockjs.patch'
+import { getQuery, isQueryObject, duration, success, error, MockResult, Headers } from './utils'
+import { mockRealRequest } from './configureDevServer'
 
-type Headers = { [key: string]: string }
-
-function isQueryObject (obj: any): obj is { [key: string]: any } {
-  return obj && typeof obj === 'object'
-}
-
-export type MockResult<T> = {
-  status: number,
-  headers?: Headers,
-  data: T
-}
-
-export async function duration (time: number) {
-  await new Promise(resolve => {
-    setTimeout(resolve, time)
-  })
-}
-
-export function success<T> (data: T, result?: MockResult<T>) {
-  return {
-    status: 200,
-    data,
-    ...result
-  }
-}
-
-export function error<T> (data: T, result?: MockResult<T>) {
-  return {
-    status: 500,
-    data,
-    ...result
-  }
-}
-
-export function tunneling () {
-  return {
-    status: -1,
-    data: useTunneling
-  }
-}
+export { MockResult, duration, success, error } from './utils'
+export { configureDevServer } from './configureDevServer'
 
 type Context<Params> = {
   context: {
@@ -108,6 +72,7 @@ export type MockConfig<Params = unknown, Result = unknown> = false
 export type MockOptions = {
   load?: (path: string) => any;
   useProxy?: boolean;
+  highPriority?: boolean;
   axios?: AxiosStatic;
 }
 
@@ -117,6 +82,18 @@ type MockError = {
   request: AxiosRequestConfig;
   originalRequest: AxiosRequestConfig;
   response: MockResponseConf<unknown, unknown>;
+}
+
+const useTunneling = Symbol('useTunneling')
+const useMockData = Symbol('useMockData')
+const useProxy = new Error()
+const originalAxios = axios.create()
+
+export function tunneling () {
+  return {
+    status: -1,
+    data: useTunneling
+  }
 }
 
 function looseValid (rule: ((data: object) => MockjsValidRsItem[]) | object, data: object): MockjsValidRsItem[] {
@@ -210,15 +187,6 @@ function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosR
   }
 }
 
-function getQuery (request: AxiosRequestConfig) {
-  return extend(
-    {},
-    qs.parse(request.url!),
-    // 合并 req.params 的参数
-    mapValues(request.params, (value, key) => JSON.stringify(value))
-  )
-}
-
 function matching (
   confs: MockConfig<unknown, unknown> | false,
   req: AxiosRequestConfig,
@@ -308,19 +276,22 @@ async function handleMockFunction (originalRequest: AxiosRequestConfig, mockConf
   }
 }
 
-const useTunneling = Symbol('useTunneling')
-const useMockData = Symbol('useMockData')
-const useProxy = new Error()
-const originalAxios = axios.create()
-
-function hackInterceptorsRequestUse (request: AxiosInterceptorManager<AxiosRequestConfig>, requestInterceptor: (request: AxiosRequestConfig) => Promise<AxiosRequestConfig>) {
-  let requestInterceptorId = request.use(requestInterceptor)
-  const _use = request.use
-  request.use = (...args) => {
-    request.eject(requestInterceptorId)
-    const id = _use.apply(request, args)
-    requestInterceptorId = _use.call(request, requestInterceptor)
-    return id
+function setRequestInterceptor (
+  request: AxiosInterceptorManager<AxiosRequestConfig>,
+  requestInterceptor: (request: AxiosRequestConfig) => Promise<AxiosRequestConfig>,
+  asLast = true
+) {
+  if (asLast) {
+    let requestInterceptorId = request.use(requestInterceptor)
+    const _use = request.use
+    request.use = (...args) => {
+      request.eject(requestInterceptorId)
+      const id = _use.apply(request, args)
+      requestInterceptorId = _use.call(request, requestInterceptor)
+      return id
+    }
+  } else {
+    request.use(requestInterceptor)
   }
 }
 
@@ -427,6 +398,10 @@ export default {
         }
         if (mockData) {
           if (!mockData.logged) console.log(`>>>> mock req: ${originalRequest.url}`, originalRequest)
+          if (process.env.NODE_ENV === 'development') {
+            // 模拟一个真实的网络请求
+            mockRealRequest(originalAxios, originalRequest, mockData)
+          }
           throw merge({url: useMockData, request, originalRequest}, defaultConf, mockData)
         } else {
           return originalRequest
@@ -476,13 +451,13 @@ export default {
         }
       }
 
-      hackInterceptorsRequestUse(axios.interceptors.request, requestInterceptor)
+      setRequestInterceptor(axios.interceptors.request, requestInterceptor, options.highPriority)
       axios.interceptors.response.use(undefined, responseInterceptor)
 
       const _create = axios.create
       axios.create = (...args) => {
         const instance = _create(...args)
-        hackInterceptorsRequestUse(instance.interceptors.request, requestInterceptor)
+        setRequestInterceptor(instance.interceptors.request, requestInterceptor, options.highPriority)
         instance.interceptors.response.use(undefined, responseInterceptor)
         return instance
       }

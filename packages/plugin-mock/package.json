@@ -1,6 +1,6 @@
 {
   "name": "@udock/plugin-mock",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/express": "^4.17.9",
     "@types/js-url": "^1.8.29",
     "@types/mockjs": "^1.0.3",
     "@types/qs": "^6.9.4"
