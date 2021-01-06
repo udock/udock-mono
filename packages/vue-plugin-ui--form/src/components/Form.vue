@@ -16,7 +16,7 @@ import defaultMessages from '../i18n/langs'
 type FormItem = {
   prop: string;
   resetField: () => void;
-  validate: (trigger: string, callback: any, options: any) => any
+  validate: (trigger: string, callback: any, options: any) => any;
 }
 
 export default defineComponent({
