@@ -6,6 +6,11 @@
     "noEmit": true                        /* Do not emit outputs. */
   },
   "references": [
+    { "path": "./packages/mini-anyproxy" },
+    { "path": "./packages/vue-cli-plugin-mock" },
+    { "path": "./packages/plugin-mock" },
+    { "path": "./packages/map-data" },
+    { "path": "./packages/mock-server" },
     { "path": "./packages/async-validator" },
     { "path": "./packages/react-app-rewire-auto-router" },
     { "path": "./packages/react-plugin-auto-router" },
@@ -16,6 +21,8 @@
     { "path": "./packages/vue-cli-plugin-i18n" },
     { "path": "./packages/vue-plugin-i18n" },
     { "path": "./packages/vue-cli-plugin-ui" },
-    { "path": "./packages/vue-plugin-ui" }
+    { "path": "./packages/vue-plugin-ui" },
+    { "path": "./packages/vue-plugin-element-ui" },
+    { "path": "./packages/vue-plugin-mock" }
   ]
 }
