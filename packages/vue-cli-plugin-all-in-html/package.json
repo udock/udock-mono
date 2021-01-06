@@ -1,0 +1,13 @@
+{
+  "name": "@udock/vue-cli-plugin-all-in-html",
+  "version": "2.0.0",
+  "description": "vue-cli-plugin-all-in-html",
+  "main": "index.js",
+  "scripts": {
+  },
+  "author": "vaniship@gmail.com",
+  "license": "MIT",
+  "peerDependencies": {
+    "@vue/cli-service": "^5.0.0"
+  }
+}
