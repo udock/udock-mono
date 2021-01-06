@@ -1,0 +1,22 @@
+{
+  "name": "@udock/vue-plugin-element-ui",
+  "version": "2.0.0",
+  "author": {
+    "name": "vaniship@gmail.com"
+  },
+  "description": "@udock/vue-plugin-element-ui",
+  "directories": {
+    "lib": "lib",
+    "template": "template"
+  },
+  "main": "dist/index.js",
+  "peerDependencies": {
+    "element-ui": "^2.13.2",
+    "lodash": "^4.17.19",
+    "vue": "^2.6.11"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "license": "MIT"
+}
