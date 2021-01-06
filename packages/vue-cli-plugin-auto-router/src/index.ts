@@ -1,6 +1,8 @@
+import { PluginAPI, ProjectOptions } from '@vue/cli-service/types'
+
 const udockBootstrapLoader = require.resolve('@udock/vue-plugin-auto-router/dist/lib/loader')
 
-export = function (api: any, options: any) {
+export = function (api: PluginAPI, options: ProjectOptions) {
 
   const fjs = require.resolve('@udock/vue-plugin-auto-router')
   const fts = fjs.replace(/\.js$/i, '.ts')

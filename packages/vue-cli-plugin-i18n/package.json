@@ -11,6 +11,9 @@
   "dependencies": {
     "@udock/vue-plugin-i18n": "^2.0.0"
   },
+  "devDependencies": {
+    "@vue/cli-service": "^4.5.9"
+  },
   "main": "dist/index.js",
   "license": "MIT"
 }

@@ -1,7 +1,9 @@
+import { PluginAPI, ProjectOptions } from '@vue/cli-service/types'
+
 const udockBootstrapLoader = require.resolve('@udock/vue-plugin-ui/dist/lib/loader')
 const udockUiStyleLoader = require.resolve('@udock/vue-plugin-ui/dist/lib/style-loader')
 
-export = function (api: any, options: any) {
+export = function (api: PluginAPI, options: ProjectOptions) {
 
   const fjs = require.resolve('@udock/vue-plugin-ui')
   const fts = fjs.replace(/\.js$/i, '.ts')

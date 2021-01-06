@@ -12,5 +12,8 @@
   "license": "MIT",
   "dependencies": {
     "@udock/vue-plugin-auto-router": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^4.5.9"
   }
 }
