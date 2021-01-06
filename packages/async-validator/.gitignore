@@ -28,3 +28,4 @@ lib
 coverage
 yarn.lock
 /pkg/
+__tests__
