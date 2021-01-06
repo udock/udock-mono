@@ -1,6 +1,6 @@
-import path = require('path');
-import webpack = require('webpack');
-import generate from './generator'
+import path = require('path')
+import webpack = require('webpack')
+import generate = require('./generator')
 const FRAMEWORK_NAMESPACE = 'udock'
 
 export = function udockBootstrapLoader(this: webpack.loader.LoaderContext, content: string, map: any) {

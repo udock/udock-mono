@@ -2,7 +2,7 @@
   "name": "@udock/react-plugin-auto-router",
   "version": "2.0.1",
   "description": "@udock/react-plugin-auto-router",
-  "main": "dist/index.jsx",
+  "main": "dist/index.js",
   "directories": {
     "lib": "lib",
     "template": "template"
