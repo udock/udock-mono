@@ -1,0 +1,15 @@
+{
+  "name": "@udock/map-data",
+  "version": "2.0.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {},
+  "peerDependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {},
+  "license": "MIT"
+}
