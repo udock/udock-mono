@@ -35,7 +35,7 @@ function rule (env: string) {
         }
       },
       {
-        loader: require.resolve('@udock/react-plugin-auto-router/lib/loader')
+        loader: require.resolve('@udock/react-plugin-auto-router/dist/lib/loader')
       }
     ]
   }
