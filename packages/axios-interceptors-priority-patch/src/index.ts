@@ -11,6 +11,7 @@ type PRIORITY = {
 
 declare module 'axios' {
   export interface AxiosInterceptorManager<V> {
+    use(onFulfilled?: (value: V) => V | Promise<V>, onRejected?: (error: any) => any, priority?: number): number;
     PRIORITY: PRIORITY;
   }
 }
