@@ -1,0 +1,17 @@
+{
+  "name": "@udock/axios-interceptors-priority-patch",
+  "version": "2.0.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {},
+  "dependencies": {},
+  "peerDependencies": {
+    "axios": "^0.20.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0"
+  },
+  "license": "MIT"
+}
