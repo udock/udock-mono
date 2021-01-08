@@ -1,12 +1,13 @@
 {
   "name": "@udock/plugin-mock",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "main": "dist/index.js",
   "files": [
     "dist"
   ],
   "scripts": {},
   "dependencies": {
+    "@udock/axios-interceptors-priority-patch": "^2.0.1",
     "mockjs": "^1.0.1-beta3",
     "qs": "^6.9.4",
     "xml-js": "^1.6.11"

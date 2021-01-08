@@ -1,3 +1,4 @@
+import '@udock/axios-interceptors-priority-patch'
 import './mockjs.patch'
 import {
   isFunction,
@@ -276,25 +277,6 @@ async function handleMockFunction (originalRequest: AxiosRequestConfig, mockConf
   }
 }
 
-function setRequestInterceptor (
-  request: AxiosInterceptorManager<AxiosRequestConfig>,
-  requestInterceptor: (request: AxiosRequestConfig) => Promise<AxiosRequestConfig>,
-  asLast = true
-) {
-  if (asLast) {
-    let requestInterceptorId = request.use(requestInterceptor)
-    const _use = request.use
-    request.use = (...args) => {
-      request.eject(requestInterceptorId)
-      const id = _use.apply(request, args)
-      requestInterceptorId = _use.call(request, requestInterceptor)
-      return id
-    }
-  } else {
-    request.use(requestInterceptor)
-  }
-}
-
 export default {
   useProxy,
   init (options: MockOptions) {
@@ -451,14 +433,14 @@ export default {
         }
       }
 
-      setRequestInterceptor(axios.interceptors.request, requestInterceptor, options.highPriority)
-      axios.interceptors.response.use(undefined, responseInterceptor)
+      axios.interceptors.request.use(requestInterceptor, undefined, options.highPriority ? Number.MAX_SAFE_INTEGER : 0)
+      axios.interceptors.response.use(undefined, responseInterceptor, Number.MIN_SAFE_INTEGER)
 
       const _create = axios.create
       axios.create = (...args) => {
         const instance = _create(...args)
-        setRequestInterceptor(instance.interceptors.request, requestInterceptor, options.highPriority)
-        instance.interceptors.response.use(undefined, responseInterceptor)
+        instance.interceptors.request.use(requestInterceptor, undefined, options.highPriority ? Number.MAX_SAFE_INTEGER : 0)
+        instance.interceptors.response.use(undefined, responseInterceptor, Number.MIN_SAFE_INTEGER)
         return instance
       }
     }
