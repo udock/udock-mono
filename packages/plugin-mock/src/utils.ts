@@ -40,6 +40,6 @@ export function getQuery (request: AxiosRequestConfig) {
     {},
     qs.parse((request.url || '').split('?')[1]),
     // 合并 req.params 的参数
-    mapValues(request.params, (value, key) => JSON.stringify(value))
+    mapValues(request.params, value => value + '')
   )
 }

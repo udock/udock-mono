@@ -143,7 +143,9 @@ function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosR
     // 匹配 query
     if (isQueryObject(rule.query)) {
       for (const key in rule.query) {
-        rule.query[key] += '' // 转成字符串
+        if (typeof rule.query[key] !== 'object') {
+          rule.query[key] += '' // 转成字符串
+        }
       }
       const items = _valid('query', rule.query, data.query)
       if (items.length > 0) {
