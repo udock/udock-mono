@@ -1,6 +1,8 @@
-import { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { Application } from 'express'
 import { duration } from './utils'
+
+const instance = axios.create()
 
 export function configureDevServer (app: Application) {
   app.use(async (req, res, next) => {
@@ -37,12 +39,23 @@ export function configureDevServer (app: Application) {
   })
 }
 
-export function mockRealRequest (axios: AxiosInstance, request: AxiosRequestConfig, mockData: any) {
-  axios.request({
+export function mockRealRequest (request: AxiosRequestConfig, mockData: any) {
+  const source = axios.CancelToken.source()
+  if (request.cancelToken) {
+    // 用户定义了取消源
+    request.cancelToken.promise.then(reason => {
+      // 将用户原来的取消操作映射到新的取消源上
+      source.cancel(reason.message)
+    })
+  }
+
+  instance.request({
     ...request,
+    cancelToken: source.token, // 覆盖用户配置的取消源
     headers: {
       ...request.headers,
       __MOCK__: encodeURI(JSON.stringify(mockData.response))
     }
-  })
+  }).catch((e) => undefined)
+  return source
 }

@@ -35,11 +35,10 @@ export function error<T> (data: T, result?: MockResult<T>) {
     ...result
   }
 }
-
 export function getQuery (request: AxiosRequestConfig) {
   return extend(
     {},
-    qs.parse(request.url!),
+    qs.parse((request.url || '').split('?')[1]),
     // 合并 req.params 的参数
     mapValues(request.params, (value, key) => JSON.stringify(value))
   )

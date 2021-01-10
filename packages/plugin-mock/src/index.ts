@@ -1,23 +1,27 @@
+// @ts-ignore
+import settle from 'axios/lib/core/settle'
+// @ts-ignore
+import createError from 'axios/lib/core/createError'
+
 import '@udock/axios-interceptors-priority-patch'
 import './mockjs.patch'
+export { configureDevServer } from './configureDevServer'
 import {
   isFunction,
   isUndefined ,
   mapValues,
   defaults,
-  merge,
   has,
   pickBy
 } from 'lodash'
 import path from 'path'
-import axios, { AxiosStatic, AxiosRequestConfig, Method, AxiosInterceptorManager } from 'axios'
+import axios, { AxiosStatic, AxiosRequestConfig, Method, CancelTokenSource } from 'axios'
 import Mock, { MockjsValidRsItem } from 'mockjs'
 import convert from 'xml-js'
 import { getQuery, isQueryObject, duration, success, error, MockResult, Headers } from './utils'
 import { mockRealRequest } from './configureDevServer'
 
 export { MockResult, duration, success, error } from './utils'
-export { configureDevServer } from './configureDevServer'
 
 type Context<Params> = {
   context: {
@@ -48,7 +52,6 @@ type MockResponseConf<Params, Result> = {
   duration?: number;
   headers?: Headers;
   _format?: string | Function;
-  proxyPass?: string;
 }
 
 export type MockFunction<Result = unknown> = (request: AxiosRequestConfig, ctx: {
@@ -72,23 +75,21 @@ export type MockConfig<Params = unknown, Result = unknown> = false
 
 export type MockOptions = {
   load?: (path: string) => any;
-  useProxy?: boolean;
-  highPriority?: boolean;
+  priority?: number;
   axios?: AxiosStatic;
+  allowOverrideAdapter?: boolean;
 }
 
-type MockError = {
-  url: string | symbol;
-  useProxy: Error;
-  request: AxiosRequestConfig;
-  originalRequest: AxiosRequestConfig;
-  response: MockResponseConf<unknown, unknown>;
-}
+const LOG_STYLE_REQUEST = 'color: gray'
+const LOG_STYLE_RESPONSE = 'color: #43BB88'
+const LOG_STYLE_TUNNELING = 'color: #CF88FF'
+const LOG_STYLE_SKIP = 'color: #99001F'
 
 const useTunneling = Symbol('useTunneling')
-const useMockData = Symbol('useMockData')
-const useProxy = new Error()
-const originalAxios = axios.create()
+
+function optional<T>(value: T, defaultValue: T) {
+  return value === undefined ? defaultValue : value
+}
 
 export function tunneling () {
   return {
@@ -108,7 +109,7 @@ function looseValid (rule: ((data: object) => MockjsValidRsItem[]) | object, dat
   }
 }
 
-function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosRequestConfig): boolean {
+function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosRequestConfig & { query?: unknown }): boolean {
   if (!rule || rule.enable === false) {
     return true
   } else {
@@ -144,7 +145,7 @@ function valid (rule: MockRequestConf<unknown> | false | undefined, data: AxiosR
       for (const key in rule.query) {
         rule.query[key] += '' // 转成字符串
       }
-      const items = _valid('query', rule.query, data.params)
+      const items = _valid('query', rule.query, data.query)
       if (items.length > 0) {
         return false
       }
@@ -198,7 +199,7 @@ function matching (
     for (let i=0, n=confs.length; i<n; i++) {
       const conf = confs[i]
       if (conf === false || Object.keys(conf).length === 0 || conf.enable === false) continue
-      const mergedConf = merge({}, defaultConf, conf)
+      const mergedConf = defaults({}, conf, defaultConf)
       if (defaultConf && defaultConf.tunneling !== undefined) {
         mergedConf.tunneling = defaultConf.tunneling // 高优使用全局配置
       }
@@ -210,14 +211,12 @@ function matching (
   } else if (typeof confs === 'function') {
     return confs
   } else if (typeof confs === 'object') {
-    return () => {
-      return confs
-    }
+    return async () => confs
   }
 }
 
 function mockWithContext (template: any, context: any) {
-  template = merge({}, template)
+  template = defaults({}, template)
   const _format = template._format
   delete template._format
   try {
@@ -253,18 +252,19 @@ function mockWithContext (template: any, context: any) {
   }
 }
 
-async function handleMockFunction (originalRequest: AxiosRequestConfig, mockConf: Function) {
+async function handleMockFunction (config: AxiosRequestConfig, mockFunction: MockFunction, mockFilePath: string) {
   try {
-    const response = await mockConf(originalRequest, {
+    const response = await mockFunction(config, {
       duration,
       success,
       error,
       tunneling
     })
     if (response.data === useTunneling) {
+      console.log(`%c>>>> mock tunneling(${config.url}, mock-by: ${mockFilePath})`, LOG_STYLE_TUNNELING, config)
       return
     } else {
-      console.log(`>>>> mock req: ${originalRequest.url}`, originalRequest)
+      console.log(`%c>>>> mock req(${config.url}, mock-by:: ${mockFilePath}): `, LOG_STYLE_REQUEST, config)
       return {
         response: { ...response, duration: 0 },
         logged: true
@@ -278,9 +278,13 @@ async function handleMockFunction (originalRequest: AxiosRequestConfig, mockConf
 }
 
 export default {
-  useProxy,
   init (options: MockOptions) {
-    const config = defaults(options.load!('config'), {
+    defaults(options, {
+      priority: Number.MAX_SAFE_INTEGER,
+      allowOverrideAdapter: false
+    })
+
+    const globalConfig = defaults(options.load!('config'), {
       global: {},
       localServer: {},
       thirdParty: {},
@@ -288,15 +292,13 @@ export default {
     })
 
     function mock (axios: AxiosStatic) {
-      const requestInterceptor = async (request: AxiosRequestConfig) => {
+      const requestInterceptor = async (config: AxiosRequestConfig) => {
         let hostname
-        let url
         let mockData
-        let originalRequest = request
+        let url = config.url || ''
         let defaultConf: MockConfItem<unknown, unknown> | undefined
-        request = defaults({query: getQuery(request)}, request)
-        if (config.global.enable !== false) { // 全局总开关
-          url = request.url!
+
+        if (globalConfig.global.enable !== false) { // 全局总开关
           let pathname
           let port
           if (url.startsWith('/')) {
@@ -304,7 +306,7 @@ export default {
             hostname = undefined
             port = undefined
           } else {
-            const oUrl = new URL(request.url!)
+            const oUrl = new URL(config.url!)
             pathname = oUrl.pathname
             hostname = oUrl.hostname.replace(/^www\./, '')
             port = parseInt(oUrl.port)
@@ -315,36 +317,50 @@ export default {
               hostname += `:${port}`
             }
 
-            if (config.thirdParty.enable === false) {
+            if (globalConfig.thirdParty.enable === false) {
               hostname = undefined
             } else {
               hostname = `third-party/${hostname}`
-              defaultConf = config.thirdParty
+              defaultConf = globalConfig.thirdParty
             }
           } else {
-            if (config.localServer.enable === false) {
+            if (globalConfig.localServer.enable === false) {
               hostname = undefined
             } else {
               hostname = 'local-server'
-              defaultConf = config.localServer
+              defaultConf = globalConfig.localServer
             }
           }
-          defaultConf = merge({}, config.global, defaultConf)
+          defaults(defaultConf, globalConfig.global)
         }
 
+        let mockFilePath = ''
+
         if (defaultConf && defaultConf.enable !== false &&  hostname) {
+          defaults(config, { query: getQuery(config) })
           try {
             // 尝试根据请求路径精确匹配,并获取对应的模拟数据配置文件
-            const mockConf = matching(options.load!(hostname + url), request, defaultConf)
+            mockFilePath = hostname + url.split('?')[0]
+            const mockConf = matching(options.load!(mockFilePath), config, defaultConf)
             if (typeof mockConf === 'function') {
-              mockData = await handleMockFunction(originalRequest, mockConf)
+              mockData = await handleMockFunction(config, mockConf, mockFilePath)
               if (!mockData) {
-                return originalRequest
+                // 使用透传
+                return config
               }
             } else {
-              if (mockConf && !mockConf.tunneling) {
-                // 匹配成功，并且不使用透传, 进行数据模拟
-                mockData = {response: mockWithContext(mockConf.response, {request})}
+              if (mockConf) {
+                if (mockConf.tunneling) {
+                  // 匹配成功，并使用透传
+                  console.log(`%c>>>> mock tunneling(${config.url}, mock-by: ${mockFilePath})`, LOG_STYLE_TUNNELING, config)
+                  return config
+                } else {
+                  // 匹配成功，并且不使用透传, 进行数据模拟
+                  mockData = {response: mockWithContext(mockConf.response, {request: config})}
+                }
+              } else {
+                // 找到配置文件，但都不匹配
+                throw new Error('try wildcard mock')
               }
             }
           } catch (e) {
@@ -353,20 +369,25 @@ export default {
             let def = path.relative('.', path.resolve(`${hostname}${url}`, '..', '_'))
             while (!mockData) {
               try {
-                const mockConf = matching(options.load!(def), request, defaultConf)
+                mockFilePath = def
+                const mockConf = matching(options.load!(mockFilePath), config, defaultConf)
                 if (mockConf) {
                   if (typeof mockConf === 'function') {
-                    mockData = await handleMockFunction(originalRequest, mockConf)
+                    mockData = await handleMockFunction(config, mockConf, mockFilePath)
                     if (!mockData) {
-                      return originalRequest
+                      return config
                     }
                   } else {
-                    // 匹配成功，跳出循环
-                    if (!mockConf.tunneling) {
-                      // 进行数据模拟
-                      mockData = {response: mockWithContext(mockConf.response, {request})}
+                    if (mockConf.tunneling) {
+                      // 匹配成功，并使用透传
+                      console.log(`%c>>>> mock tunneling(${config.url}, mock-by: ${mockFilePath})`, LOG_STYLE_TUNNELING, config)
+                      return config
+                    } else {
+                      // 未开启透传, 进行数据模拟
+                      mockData = {response: mockWithContext(mockConf.response, {request: config})}
                     }
                   }
+                  // 匹配成功，跳出循环
                   break
                 }
               } catch (e) {}
@@ -375,75 +396,71 @@ export default {
             }
           }
         }
-        if (options.useProxy) {
-          mockData = mockData || {useProxy}
-        }
+
         if (mockData) {
-          if (!mockData.logged) console.log(`>>>> mock req: ${originalRequest.url}`, originalRequest)
-          if (process.env.NODE_ENV === 'development') {
-            // 模拟一个真实的网络请求
-            mockRealRequest(originalAxios, originalRequest, mockData)
-          }
-          throw merge({url: useMockData, request, originalRequest}, defaultConf, mockData)
-        } else {
-          return originalRequest
-        }
-      }
-
-      const responseInterceptor = (error: MockError) => {
-        if (error.url === useMockData) {
-          const originalRequest = error.originalRequest
-          if (error.response.proxyPass && originalRequest.url?.startsWith('/')) {
-            originalRequest.url = error.response.proxyPass.replace(/\/$/, '') + originalRequest.url
-            return originalAxios.request(originalRequest).catch(err => {
-              return err.response
-            })
-          }
-          if (error.useProxy === useProxy) {
-            return Promise.reject(useProxy)
-          }
-          // return Promise.resolve(error)
-          return new Promise((resolve, reject) => {
-            const timeout = error.request.timeout || axios.defaults.timeout || 240000
-            const duration = error.response.duration || 0
-            if (timeout > duration) {
-              setTimeout(() => {
-                const response = {
-                  ...error.response,
-                  config: error.request,
-                  __IS_MOCK_DATA__: true
-                }
-                delete response.duration
-                if (error.response.status >= 200 && error.response.status < 400) {
-                  console.log(`>>>> mock res(${response.status}, ${response.config.url}):`, response)
-                  resolve(response)
-                } else {
-                  console.log(`>>>> mock res(${response.status}, ${response.config.url}):`, response)
-                  reject(response)
-                }
-              }, duration)
-            } else {
-              setTimeout(() => {
-                reject(new Error(`timeout of ${timeout}ms exceeded`))
-              }, timeout)
+          if (config.adapter === axios.defaults.adapter || options.allowOverrideAdapter) {
+            if (!mockData.logged) console.log(`%c>>>> mock req(${config.url}, mock-by: ${mockFilePath}): `, LOG_STYLE_REQUEST, config)
+            let source: CancelTokenSource | undefined
+            if (process.env.NODE_ENV === 'development') {
+              // 模拟一个真实的网络请求，返回取消源
+              source = mockRealRequest(config, mockData)
             }
-          })
-        } else {
-          return Promise.reject(error)
+            const response = defaults({}, mockData.response, defaultConf && defaultConf.response)
+
+            config.adapter = () => {
+              return new Promise((resolve, reject) => {
+                const timeout = config.timeout || axios.defaults.timeout || 240000
+                const duration = response.duration || 0
+                let timer: NodeJS.Timeout
+                if (timeout > duration) {
+                  // 模拟正常返回的请求
+                  timer = setTimeout(() => {
+                    Object.assign(response, {
+                      config: config,
+                      __IS_MOCK_DATA__: true
+                    })
+                    delete response.duration
+                    console.log(`%c>>>> mock res(${response.status}, ${config.url}, mock-by: ${mockFilePath}):`, LOG_STYLE_RESPONSE, response)
+                    settle(resolve, reject, response)
+                  }, duration)
+                } else {
+                  // 模拟超时请求
+                  timer = setTimeout(() => {
+                    reject(createError(`timeout of ${config.timeout}ms exceeded, mock-by: ${mockFilePath}`, config, 'ECONNABORTED'));
+                  }, timeout)
+                }
+                if (config.cancelToken) {
+                  // 处理请求取消
+                  config.cancelToken.promise.then(reason => {
+                    // 清除计时器
+                    clearTimeout(timer)
+                    if (source) {
+                      // 如果开启了真实请求模拟，取消模拟的真实请求
+                      source.cancel(reason.message)
+                    }
+                    reject(reason)
+                  })
+                }
+              })
+            }
+          } else {
+            console.log(`%c>>>> mock skip (reason: allowOverrideAdapter=false, mock-by: ${mockFilePath}) ...`, LOG_STYLE_SKIP, config)
+          }
         }
+
+        return config
       }
 
-      axios.interceptors.request.use(requestInterceptor, undefined, options.highPriority ? Number.MAX_SAFE_INTEGER : 0)
-      axios.interceptors.response.use(undefined, responseInterceptor, Number.MIN_SAFE_INTEGER)
+      axios.interceptors.request.use(requestInterceptor, undefined, options.priority)
 
       const _create = axios.create
       axios.create = (...args) => {
         const instance = _create(...args)
-        instance.interceptors.request.use(requestInterceptor, undefined, options.highPriority ? Number.MAX_SAFE_INTEGER : 0)
-        instance.interceptors.response.use(undefined, responseInterceptor, Number.MIN_SAFE_INTEGER)
+        instance.interceptors.request.use(requestInterceptor, undefined, options.priority)
         return instance
       }
     }
+
     mock(options.axios || axios)
   }
 }
